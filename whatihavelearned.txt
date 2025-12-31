@@ -1,0 +1,11 @@
+#####02#####
+python -3.7 --version #指定py版本进行操作
+pyhton -3.7 -m venv env #创建名为env的虚拟环境
+env/Scripts/activate #激活虚拟环境
+django-admin startproject my_blog #创建名为my_blog的django项目
+python manage.py runserver #启动开发服务器
+#####03#####
+python manage.py startapp article #创建名为rticle的app
+注册article app见my_blog/my_blog/settings.py中INSTALLED_APPS
+配置article app 访问路径见my_blog/my_blog/urls.py中urlpatterns
+创建article app 自己的路由分发见my_blog/article/urls.py(非自动创建)
