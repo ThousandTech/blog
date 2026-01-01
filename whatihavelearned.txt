@@ -14,3 +14,5 @@ python manage.py makemigrations # 生成迁移文件
 python manage.py migrate # 执行迁移
 每次更改数据库本身时使用数据迁移，先生成迁移文件再执行迁移，同时迁移可以像git一样回滚
 不必每次更改表结构都要删除或重新创建
+#####05#####
+python manage.py createsuperuser # 创建管理员账户
