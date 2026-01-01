@@ -9,3 +9,8 @@ python manage.py startapp article #创建名为rticle的app
 注册article app见my_blog/my_blog/settings.py中INSTALLED_APPS
 配置article app 访问路径见my_blog/my_blog/urls.py中urlpatterns
 创建article app 自己的路由分发见my_blog/article/urls.py(非自动创建)
+#####04#####
+python manage.py makemigrations # 生成迁移文件
+python manage.py migrate # 执行迁移
+每次更改数据库本身时使用数据迁移，先生成迁移文件再执行迁移，同时迁移可以像git一样回滚
+不必每次更改表结构都要删除或重新创建
