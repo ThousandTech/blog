@@ -1,0 +1,12 @@
+{% for article in articles %}
+<!--循环开始-->
+	<p>{{ article.title }}</p>
+    <!--模板变量 (Variables) - {{ ... }}-->
+    <!--用来输出变量的值到页面上-->
+    <p>{{ article.author }}</p>
+    <p>{{ article.body }}</p>
+<!--循环结束-->
+<!--模板标签 (Tags) - { % ... % }-->
+<!--用来执行逻辑控制，比如循环和判断等-->
+<!--同时必须显式结束-->
+{% endfor %}
