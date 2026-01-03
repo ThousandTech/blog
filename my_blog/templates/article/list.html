@@ -1,12 +1,47 @@
-{% for article in articles %}
-<!--循环开始-->
-	<p>{{ article.title }}</p>
-    <!--模板变量 (Variables) - {{ ... }}-->
-    <!--用来输出变量的值到页面上-->
-    <p>{{ article.author }}</p>
-    <p>{{ article.body }}</p>
-<!--循环结束-->
-<!--模板标签 (Tags) - { % ... % }-->
-<!--用来执行逻辑控制，比如循环和判断等-->
-<!--同时必须显式结束-->
-{% endfor %}
+<!-- 07 extends表明此页面继承自 base.html 文件，会加载base.html中的内容之后填充base.html的定义块 -->
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+<!-- 07 写入 base.html 中定义的 title -->
+{% block title %}
+    首页
+{% endblock title %}
+
+<!-- 07 写入 base.html 中定义的 content -->
+{% block content %}
+
+<!-- 定义放置文章标题的div容器 -->
+<div class="container">
+    <div class="row mt-2">
+
+        {% for article in articles %}
+        <!-- 06 循环开始-->
+        <!-- 文章内容 -->
+        <div class="col-4 mb-4">
+        <!-- 卡片容器 -->
+            <div class="card h-100">
+                <!-- 标题 -->
+                <h4 class="card-header">{{ article.title }}</h4>
+                <!-- 06 模板变量 (Variables) - {{ ... }}-->
+                <!-- 06 用来输出变量的值到页面上-->
+                <!-- 摘要 -->
+                <div class="card-body">
+                    <!-- 07 把article.body通过管道符'|'传给slice过滤器，截取前100个字符 -->
+                    <p class="card-text">{{ article.body|slice:'100' }}...</p>
+                </div>
+                <!-- 注脚 -->
+                <div class="card-footer">
+                    <a href="#" class="btn btn-primary">阅读本文</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        <!-- 06 循环结束-->
+        <!-- 06 模板标签 (Tags) - { % ... % }-->
+        <!-- 06 用来执行逻辑控制，比如循环和判断等-->
+        <!-- 06 同时必须显式结束-->
+
+    </div>
+</div>
+{% endblock content %}
