@@ -32,7 +32,8 @@
                 </div>
                 <!-- 注脚 -->
                 <div class="card-footer">
-                    <a href="#" class="btn btn-primary">阅读本文</a>
+                    <!-- 08 在命名空间article中找到别名为article_detail的路由并传入article.id作为参数 -->
+                    <a href="{% url 'article:article_detail' article.id %}" class="btn btn-primary">阅读本文</a>
                 </div>
             </div>
         </div>
