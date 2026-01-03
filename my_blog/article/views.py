@@ -1,4 +1,8 @@
+# 09 导入markdown
+import markdown
+
 from django.shortcuts import render
+
 # 05 导入HttpResponse模块
 from django.http import HttpResponse
 
@@ -21,6 +25,13 @@ def article_list(request):
 def article_detail(request,id):
 
     article = ArticlePost.objects.get(id=id)
+
+    # 09 将article.body由markdown转为html
+    article.body = markdown.markdown(article.body,
+                                    extensions=[
+                                        'markdown.extensions.extra',
+                                        'markdown.extensions.codehilite',
+                                    ])
 
     context = {'article':article}
 
