@@ -1,0 +1,35 @@
+<!-- extends表明此页面继承自 base.html 文件 -->
+{% extends "base.html" %} {% load staticfiles %}
+<!-- 写入 base.html 中定义的 title -->
+{% block title %} 写文章 {% endblock title %}
+<!-- 写入 base.html 中定义的 content -->
+{% block content %}
+<!-- 写文章表单 -->
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <br>
+            <!-- 10 提交文章的表单 提交方式为POST 提交地址为当前页面 -->
+            <form method="post" action=".">
+                <!-- 10 Django中需要POST数据的地方都必须有csrf_token 否则会403-->
+                {% csrf_token %}
+                <!-- 文章标题 -->
+                <div class="form-group">
+                    <!-- 标签 -->
+                    <label for="title">文章标题</label>
+                    <!-- 10 文本框 name是表单的类字典对象的键，与表单类字段对应 -->
+                    <input type="text" class="form-control" id="title" name="title">
+                </div>
+                <!-- 文章正文 -->
+                <div class="form-group">
+                    <label for="body">文章正文</label>
+                    <!-- 10 文本区域 body是表单的类字典对象的键，与表单类字段对应 -->
+                    <textarea type="text" class="form-control" id="body" name="body" rows="12"></textarea>
+                </div>
+                <!-- 提交按钮 -->
+                <button type="submit" class="btn btn-primary">提交</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

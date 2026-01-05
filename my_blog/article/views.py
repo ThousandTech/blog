@@ -1,10 +1,17 @@
 # 09 导入markdown
 import markdown
 
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 
 # 05 导入HttpResponse模块
+# 10 引入重定向模块
 from django.http import HttpResponse
+
+# 10 引入ArticlePostForm表单类
+from .forms import ArticlePostForm
+
+# 10 引入User模型
+from django.contrib.auth.models import User
 
 # 06 导入数据模型
 from .models import ArticlePost
@@ -36,3 +43,30 @@ def article_detail(request,id):
     context = {'article':article}
 
     return render(request,'article/detail.html',context)
+
+# 10 写文章视图函数
+def article_create(request):
+    # 10 如果用户提交数据
+    if request.method == "POST":
+        # 10 将收到的表单数据(类字典对象)存进article_post_form
+        article_post_form = ArticlePostForm(data=request.POST)
+        # 10 如果表单内容合法
+        if article_post_form.is_valid():
+            # 10 生成不写入数据库的ArticlePost实例
+            new_article = article_post_form.save(commit=False)
+            # 10 修改作者为1
+            new_article.author = User.objects.get(id=1)
+            # 10 保存文件到数据库
+            new_article.save()
+            # 10 重定向到文章列表
+            return redirect("article:article_list")
+        # 10 如果表单数据不合法，返回错误信息
+        else:
+            return HttpResponse("表单内容有误，请重新填写")
+    # 10 如果用户请求获取数据
+    else:
+        # 10 实例化表单类
+        article_post_form = ArticlePostForm()
+        # 10 上下文，模板会用前面的名字找后面的对象
+        context = {'article_post_form':article_post_form}
+        return render(request,'article/create.html',context)
