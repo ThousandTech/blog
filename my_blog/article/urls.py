@@ -12,4 +12,8 @@ urlpatterns = [
     path('article-detail/<int:id>/',views.article_detail,name='article_detail'),
     # 10 写文章路由
     path('article-create/',views.article_create,name='article_create'),
+    # 11 删除文章路由(不安全)
+    # path('article-delete/<int:id>/',views.article_delete,name='article_delete'),
+    # 11 删除文章路由(安全)
+    path('article-safe-delete/<int:id>/',views.article_safe_delete,name='article_safe_delete'),
 ]

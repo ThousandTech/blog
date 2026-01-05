@@ -70,3 +70,24 @@ def article_create(request):
         # 10 上下文，模板会用前面的名字找后面的对象
         context = {'article_post_form':article_post_form}
         return render(request,'article/create.html',context)
+    
+# 11 删除文章视图函数(不安全)
+# def article_delete(request,id):
+#     # 11 得到对应的文章
+#     article = ArticlePost.objects.get(id=id)
+#     # 11 删除文章
+#     article.delete()
+#     # 11 重定向到文章列表页
+#     return redirect("article:article_list")
+
+# 11 删除文章视图函数(安全)
+def article_safe_delete(request,id):
+    if request.method == "POST":
+        # 11 得到对应的文章
+        article = ArticlePost.objects.get(id=id)
+        # 11 删除文章
+        article.delete()
+        # 11 重定向到文章列表页
+        return redirect("article:article_list")
+    else:
+        return HttpResponse("删除操作仅允许POST请求")
