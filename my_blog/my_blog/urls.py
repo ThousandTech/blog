@@ -18,9 +18,11 @@ from django.urls import path,include# 03引入include函数
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('article/', include('article.urls', namespace='article')),
-    # 03告诉django怎样定位article应用
+    # 03 告诉django怎样定位article应用
     # 03 'article/'参数分配了一个URL前缀给article应用
     # 03 include('article.urls', namespace='article')参数告诉Django去查找article应用下的urls.py文件
     # 03 namespace='article'参数为article应用指定了一个命名空间
+    path('article/', include('article.urls', namespace='article')),
+    # 13 用户管理根路由
+    path('userprofile/',include('userprofile.urls',namespace='userprofile')),
 ]

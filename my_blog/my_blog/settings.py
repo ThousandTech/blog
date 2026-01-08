@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'article',# 03注册article应用，告诉django现在有article这个app
+    'article',# 03 注册article应用，告诉django现在有article这个app
+    'userprofile',# 13 注册userprofile应用
 ]
 
 MIDDLEWARE = [

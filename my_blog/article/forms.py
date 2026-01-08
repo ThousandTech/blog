@@ -4,6 +4,7 @@ from django import forms
 from .models import ArticlePost
 
 # 10 文章表单类
+# 13 继承forms.ModelForm以对数据库进行修改，无需手动配置字段
 class ArticlePostForm(forms.ModelForm):
     class Meta:
         # 10 指明数据模型来源
