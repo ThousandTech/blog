@@ -1,5 +1,8 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth.models import User
+# 15 引入验证登录的装饰器
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from .forms import UserLoginForm,UserRegisterForm
 
@@ -62,3 +65,18 @@ def user_register(request):
         return render(request,'userprofile/register.html',context)
     else:
         return HttpResponse("请使用GET或POST请求数据")
+
+# 15 装饰器，用户已登录则执行下面的删除函数，未登录则跳转至登录页
+@login_required(login_url = '/userprofile/login/')
+def user_delete(request,id):
+    if request.method == 'POST':
+        user = User.objects.get(id=id)
+        # 15 仅能注销自己的帐号，request.user是django根据请求中的id自动从数据库查出来的User实例
+        if request.user == user:
+            logout(request)
+            user.delete()
+            return redirect("article:article_list")
+        else:
+            return HttpResponse("无删除权限")
+    else:
+        return HttpResponse("此操作仅接受POST请求")

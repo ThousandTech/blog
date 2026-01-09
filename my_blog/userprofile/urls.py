@@ -10,4 +10,6 @@ urlpatterns = [
     path('logout/',views.user_logout,name='logout'),
     # 14 用户注册路由
     path('register/',views.user_register,name='register'),
+    # 15 用户删除路由
+    path('delete/<int:id>/',views.user_delete,name='delete'),
 ]
