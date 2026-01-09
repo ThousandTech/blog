@@ -25,4 +25,6 @@ urlpatterns = [
     path('article/', include('article.urls', namespace='article')),
     # 13 用户管理根路由
     path('userprofile/',include('userprofile.urls',namespace='userprofile')),
+    # 16 重置密码路由
+    path('password-reset/',include('password_reset.urls')),
 ]

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'article',# 03 注册article应用，告诉django现在有article这个app
     'userprofile',# 13 注册userprofile应用
+    'password_reset',# 16 重置密码应用
 ]
 
 MIDDLEWARE = [
@@ -105,7 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-hans'
 
 TIME_ZONE = 'Asia/Shanghai'
 
@@ -124,3 +125,16 @@ STATICFILES_DIRS = (
 )
 
 STATIC_URL = '/static/'
+
+# SMTP服务器，改为你的邮箱的smtp!
+EMAIL_HOST = 'smtp.126.com'
+# 改为你自己的邮箱名！
+EMAIL_HOST_USER = 'thousandtech@126.com'
+# 你的邮箱密码
+EMAIL_HOST_PASSWORD = 'MNch9fvHAT4EJjUv'
+# 发送邮件的端口
+EMAIL_PORT = 25
+# 是否使用 TLS
+EMAIL_USE_TLS = True
+# 默认的发件人
+DEFAULT_FROM_EMAIL = 'Thousand的博客 <thousandtech@126.com>'

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}重置成功{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center align-items-center" style="min-height: 75vh">
+        <div class="col-12 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-success">密码重置成功</h5>
+                    <p class="card-text">
+                        您的密码已成功修改。现在可以使用新密码登录了。
+                    </p>
+                    <a href="{% url 'user_profile:login' %}" class="btn btn-primary">立即登录</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
