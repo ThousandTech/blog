@@ -95,12 +95,15 @@ def profile_edit(request,id):
 
         if request.user != user:
             return HttpResponse("无修改此用户信息的权限")
-        
-        profile_form = ProfileForm(data=request.POST)
+        # 18 request.FILES上传的文件由此传递给表单类
+        profile_form = ProfileForm(request.POST, request.FILES)
         if profile_form.is_valid():
             profile_cd = profile_form.cleaned_data
             profile.phone = profile_cd['phone']
             profile.bio = profile_cd['bio']
+            # 18 如果request.FILES中存在文件则保存文件地址
+            if 'avatar' in request.FILES:
+                profile.avatar = profile_cd['avatar']
             profile.save()
             return redirect("userprofile:edit",id=id)
         else:

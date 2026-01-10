@@ -1,28 +1,101 @@
 {% extends "base.html" %} {% load staticfiles %}
-{% block title %} 用户信息 {% endblock title %}
+{% block title %} {{ user.username }} 的主页 {% endblock title %}
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-12">
-            <br>
-            <div class="col-md-4">用户名: {{ user.username }}</div>
-            <br>
-            <form method="post" action=".">
-                {% csrf_token %}
-                <!-- phone -->
-                <div class="form-group col-md-4">
-                    <label for="phone">电话</label>
-                    <input type="text" class="form-control" id="phone" name="phone" value="{{ profile.phone }}">
+<style>
+.avatar-overlay {
+    background: rgba(0,0,0,0);
+    opacity: 0;
+    transition: background 0.2s ease, opacity 0.2s ease;
+}
+.avatar-wrapper:hover .avatar-overlay {
+    background: rgba(0,0,0,0.55);
+    opacity: 1;
+}
+</style>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex flex-wrap align-items-center mb-4">
+                        <div class="avatar-wrapper mr-3 mb-3 position-relative" style="width: 130px; height: 130px;">
+                            {% if profile.avatar %}
+                                <img src="{{ profile.avatar.url }}" alt="头像" class="rounded-circle border w-100 h-100" style="object-fit: cover;">
+                            {% else %}
+                                <div class="d-flex align-items-center justify-content-center rounded-circle bg-light border w-100 h-100" style="font-size: 14px; color: #6c757d;">
+                                    暂无头像
+                                </div>
+                            {% endif %}
+                            <label for="avatar" class="avatar-overlay d-flex align-items-center justify-content-center rounded-circle position-absolute w-100 h-100" style="top: 0; left: 0; color: #fff; cursor: pointer; font-weight: 600; letter-spacing: 1px;">
+                                更换头像
+                            </label>
+                        </div>
+                        <div>
+                            <h5 class="mb-1">{{ user.username }}</h5>
+                            <div class="text-secondary small mb-2">{% if user.email %}{{ user.email }}{% else %}该用户暂未填写邮箱{% endif %}</div>
+                            <div id="avatar-tip" class="text-danger small mb-2" style="display: none;">当前为头像预览，点击下方保存生效</div>
+                            <p class="mb-0 text-secondary" style="max-width: 420px;">
+                                完善个人信息，让大家更好地了解你。
+                            </p>
+                        </div>
+                    </div>
+
+                    <form method="post" action="." enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <input type="file" class="d-none" name="avatar" id="avatar">
+                            <div class="form-group col-md-6 d-none">
+                                <label for="phone">电话</label>
+                                <input type="text" class="form-control" id="phone" name="phone" value="{{ profile.phone }}" placeholder="请输入联系电话">
+                            </div>
+                            <div class="form-group col-12">
+                                <label for="bio">简介</label>
+                                <textarea class="form-control" id="bio" name="bio" rows="6" placeholder="简单介绍一下自己">{{ profile.bio }}</textarea>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </div>
+                    </form>
                 </div>
-                <!-- bio -->
-                <div class="form-group col-md-4">
-                    <label for="bio">简介</label>
-                    <textarea type="text" class="form-control" id="bio" name="bio" rows="12">{{ profile.bio }}</textarea>
-                </div>
-                <!-- 提交按钮 -->
-                <button type="submit" class="btn btn-primary">保存</button>
-            </form>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    // 头像预览
+    document.getElementById('avatar').addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                // 查找当前头像img元素，若存在则更新，若不存在（暂无头像）则需要替换结构
+                var img = document.querySelector('.avatar-wrapper img');
+                if (img) {
+                    img.src = e.target.result;
+                } else {
+                    // 如果原先是“暂无头像”的div，则需要替换为img
+                    var wrapper = document.querySelector('.avatar-wrapper');
+                    var placeholder = wrapper.querySelector('div.d-flex');
+                    if (placeholder) {
+                        var newImg = document.createElement('img');
+                        newImg.src = e.target.result;
+                        newImg.alt = "头像";
+                        newImg.className = "rounded-circle border w-100 h-100";
+                        newImg.style.objectFit = "cover";
+                        wrapper.insertBefore(newImg, placeholder);
+                        wrapper.removeChild(placeholder);
+                    }
+                }
+                // 显示提示
+                var tip = document.getElementById('avatar-tip');
+                if (tip) {
+                    tip.style.display = 'block';
+                }
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
 {% endblock content %}

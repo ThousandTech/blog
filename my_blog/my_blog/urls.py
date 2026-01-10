@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include# 03引入include函数
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,3 +30,6 @@ urlpatterns = [
     # 16 重置密码路由
     path('password-reset/',include('password_reset.urls')),
 ]
+
+#头像URL
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

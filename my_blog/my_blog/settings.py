@@ -140,3 +140,6 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'Thousand的博客 <thousandtech@126.com>'
 # 过期时间
 PASSWORD_RESET_TOKEN_EXPIRES = 60 * 10
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR,'media/')
