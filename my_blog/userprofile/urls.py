@@ -12,4 +12,6 @@ urlpatterns = [
     path('register/',views.user_register,name='register'),
     # 15 用户删除路由
     path('delete/<int:id>/',views.user_delete,name='delete'),
+    # 17 用户信息路由
+    path('edit/<int:id>/',views.profile_edit,name='edit'),
 ]

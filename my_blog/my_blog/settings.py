@@ -138,3 +138,5 @@ EMAIL_PORT = 25
 EMAIL_USE_TLS = True
 # 默认的发件人
 DEFAULT_FROM_EMAIL = 'Thousand的博客 <thousandtech@126.com>'
+# 过期时间
+PASSWORD_RESET_TOKEN_EXPIRES = 60 * 10

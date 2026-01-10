@@ -2,6 +2,8 @@
 from django import forms
 # 13 用户模型
 from django.contrib.auth.models import User
+# 17 用户资料
+from .models import Profile
 
 # 13 登录表单，继承forms.Form类，不对数据库进行修改，需手动配置每个字段的类型
 class UserLoginForm(forms.Form):
@@ -29,3 +31,8 @@ class UserRegisterForm(forms.ModelForm):
             return data.get('password')
         else:
             raise forms.ValidationError("两次密码输入不一致，请重试")
+        
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ('phone','avatar','bio')

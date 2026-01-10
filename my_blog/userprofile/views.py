@@ -4,7 +4,8 @@ from django.contrib.auth.models import User
 # 15 引入验证登录的装饰器
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from .forms import UserLoginForm,UserRegisterForm
+from .forms import UserLoginForm,UserRegisterForm,ProfileForm
+from .models import Profile
 
 # Create your views here.
 
@@ -80,3 +81,33 @@ def user_delete(request,id):
             return HttpResponse("无删除权限")
     else:
         return HttpResponse("此操作仅接受POST请求")
+
+# 17 修改用户信息
+@login_required(login_url='/userprofile/login/')
+def profile_edit(request,id):
+    user = User.objects.get(id=id)
+    if Profile.objects.filter(user_id=id).exists():
+        profile = Profile.objects.get(user_id=id)
+    else:
+        profile = Profile.objects.create(user=user)
+
+    if request.method == 'POST':
+
+        if request.user != user:
+            return HttpResponse("无修改此用户信息的权限")
+        
+        profile_form = ProfileForm(data=request.POST)
+        if profile_form.is_valid():
+            profile_cd = profile_form.cleaned_data
+            profile.phone = profile_cd['phone']
+            profile.bio = profile_cd['bio']
+            profile.save()
+            return redirect("userprofile:edit",id=id)
+        else:
+            return HttpResponse("电话，头像或简介不合法，请重试")
+    elif request.method == 'GET':
+        profile_form = ProfileForm()
+        context = { 'profile_form':profile_form,'profile':profile,'user':user}
+        return render(request,'userprofile/edit.html',context)
+    else:
+        return HttpResponse("请使用GET或POST请求数据")

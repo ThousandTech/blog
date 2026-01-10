@@ -5,13 +5,15 @@ from django.shortcuts import render,redirect
 
 # 05 导入HttpResponse模块
 # 10 引入重定向模块
-from django.http import HttpResponse
+from django.http import HttpResponse,Http404  
 
 # 10 引入ArticlePostForm表单类
 from .forms import ArticlePostForm
 
 # 10 引入User模型
 from django.contrib.auth.models import User
+# 17 引入登录检查装饰器
+from django.contrib.auth.decorators import login_required
 
 # 06 导入数据模型
 from .models import ArticlePost
@@ -45,6 +47,7 @@ def article_detail(request,id):
     return render(request,'article/detail.html',context)
 
 # 10 写文章视图函数
+@login_required(login_url='/userprofile/login/')
 def article_create(request):
     # 10 如果用户提交数据
     if request.method == "POST":
@@ -55,7 +58,8 @@ def article_create(request):
             # 10 生成不写入数据库的ArticlePost实例
             new_article = article_post_form.save(commit=False)
             # 10 修改作者为1
-            new_article.author = User.objects.get(id=1)
+            # 17 指定作者id
+            new_article.author = User.objects.get(id=request.user.id)
             # 10 保存文件到数据库
             new_article.save()
             # 10 重定向到文章列表
@@ -81,18 +85,24 @@ def article_create(request):
 #     return redirect("article:article_list")
 
 # 11 删除文章视图函数(安全)
+@login_required(login_url='/userprofile/login/')
 def article_safe_delete(request,id):
     if request.method == "POST":
         # 11 得到对应的文章
         article = ArticlePost.objects.get(id=id)
-        # 11 删除文章
-        article.delete()
-        # 11 重定向到文章列表页
-        return redirect("article:article_list")
+        # 17 仅允许作者或管理员删除
+        if article.author == request.user or request.user.is_superuser:
+            # 11 删除文章
+            article.delete()
+            # 11 重定向到文章列表页
+            return redirect("article:article_list")
+        else:
+            return HttpResponse("删除操作仅允许作者本人和管理员使用")
     else:
         return HttpResponse("删除操作仅允许POST请求")
     
 # 12 文章更新函数
+@login_required(login_url='/userprofile/login/')
 def article_update(request,id):
     """
     更新文章的视图函数
@@ -103,23 +113,26 @@ def article_update(request,id):
     # 12 拿到要更改的文章对象
     article = ArticlePost.objects.get(id=id)
 
-    # 12 如果是POST请求
-    if request.method == "POST":
-        # 12 存储收到的表单数据
-        article_post_form = ArticlePostForm(data=request.POST)
-        # 12 如果数据均合法
-        if article_post_form.is_valid():
-            # 12 更新数据并保存
-            article.title = request.POST['title']
-            article.body = request.POST['body']
-            article.save()
-            # 12 重定向至对应id的文章详情页
-            return redirect("article:article_detail",id=id)
-        # 12 如果数据不合法
+    if article.author == request.user or request.user.is_superuser:
+        # 12 如果是POST请求
+        if request.method == "POST":
+            # 12 存储收到的表单数据
+            article_post_form = ArticlePostForm(data=request.POST)
+            # 12 如果数据均合法
+            if article_post_form.is_valid():
+                # 12 更新数据并保存
+                article.title = request.POST['title']
+                article.body = request.POST['body']
+                article.save()
+                # 12 重定向至对应id的文章详情页
+                return redirect("article:article_detail",id=id)
+            # 12 如果数据不合法
+            else:
+                return HttpResponse("表单内容有误，请重新填写")
+        # 12 如果是get请求
         else:
-            return HttpResponse("表单内容有误，请重新填写")
-    # 12 如果是get请求
+            article_post_form = ArticlePostForm()
+            context = {'article':article,'article_post_form':article_post_form}
+            return render(request,'article/update.html',context)
     else:
-        article_post_form = ArticlePostForm()
-        context = {'article':article,'article_post_form':article_post_form}
-        return render(request,'article/update.html',context)
+            return HttpResponse("编辑操作仅允许作者本人和管理员使用")
