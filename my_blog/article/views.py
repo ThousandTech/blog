@@ -21,27 +21,48 @@ from .models import ArticlePost
 # 19 分页模块
 from django.core.paginator import Paginator
 
+# 22 用来查询的Q对象
+from django.db.models import Q
+
 # 05 主页视图函数，返回HttpResponse对象或者抛出异常，request参数与请求类型有关
 def article_list(request):
     # # 05 返回最简单的网页
     # return HttpResponse("Hello World!")
-    # 21 根据不同的参数返回不同顺序的列表
-    if request.GET.get('order') == 'total_views':
-        article_list = ArticlePost.objects.all().order_by('-total_views')
-        # 21 order用来传递给模板，在切换页时保持不同的排序
-        order = 'total_views'
+    order = request.GET.get('order')
+    # 22 搜索参数
+    search = request.GET.get('search')
+    if search:
+        if order == 'total_views':
+            article_list = ArticlePost.objects.filter(
+                # 22 忽略大小写查询数据库，标题或正文有关键词就被选出
+                Q(title__icontains=search)|
+                Q(body__icontains=search)
+            ).order_by('-total_views')
+        else:
+            article_list = ArticlePost.objects.filter(
+                Q(title__icontains=search)|
+                Q(body__icontains=search)
+            )
+            order = 'normal'
     else:
-        # 06 从数据库取出所有的博客文章
-        article_list = ArticlePost.objects.all()
-        order = 'normal'
-    # 19 每页一篇文章
+        # 22 没有搜索参数会返回None，此处将search置为空字符串，防止检索None这个字符串
+        search = ''
+        # 21 根据不同的参数返回不同顺序的列表
+        if order == 'total_views':
+            article_list = ArticlePost.objects.all().order_by('-total_views')
+        else:
+            article_list = ArticlePost.objects.all()
+            order = 'normal'
+
+    # 19 每页3篇文章
     paginator = Paginator(article_list,3)
     # 19 从url中'?page=value'中获取page的值，没有这个会直接返回None
     page = request.GET.get('page')
     # 19 将页码对应的文章返回给articles，page为None返回1
     articles = paginator.get_page(page)
     # 06 context字典定义了要传递给模板的上下文
-    context = {'articles':articles,'order':order}
+    # 21 order用来传递给模板，在切换页时保持不同的排序
+    context = {'articles':articles,'order':order,'search':search}
     # 06 render函数结合模板与上下文并返回渲染后的HttpResponse对象
     # 06 render的三个参数分别为固定的request，模板文件，传入模板文件的上下文（字典）
     return render(request,'article/list.html',context)

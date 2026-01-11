@@ -19,10 +19,10 @@
             <div>
                 作者：{{ article.author }}
                 {% if user == article.author or user.is_superuser %}
-                    · <a href="#" onclick="confirm_delete()">删除文章</a>
                     · <a href="{% url "article:article_update" article.id %}">
                         编辑文章
                     </a>
+                    · <a href="#" onclick="confirm_delete()">删除文章</a>
                 {% endif %}
             </div>
             <div>
