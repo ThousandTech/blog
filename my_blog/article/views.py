@@ -76,13 +76,17 @@ def article_detail(request,id):
     article.save(update_fields=['total_views'])
 
     # 09 将article.body由markdown转为html
-    article.body = markdown.markdown(article.body,
-                                    extensions=[
-                                        'markdown.extensions.extra',
-                                        'markdown.extensions.codehilite',
-                                    ])
+    md = markdown.Markdown(
+        extensions=[
+            'markdown.extensions.extra',
+            'markdown.extensions.codehilite',
+            # 23 目录扩展
+            'markdown.extensions.toc',
+        ])
+    
+    article.body = md.convert(article.body)
 
-    context = {'article':article}
+    context = {'article':article,'toc':md.toc}
 
     return render(request,'article/detail.html',context)
 

@@ -9,38 +9,69 @@
 
 <!-- 写入 base.html 中定义的 content -->
 {% block content %}
+<style> 
+    .sidebar-sticky div > ul {
+         padding-left: 0;
+    }
+    .sidebar-sticky ul ul {
+        padding-left: 1.2em;
+    }
+    .sidebar-sticky a {
+        color: #0056b3;
+    }
+    .sidebar-sticky a:hover {
+        color: black;
+    }
+</style>
 
 <!-- 文章详情 -->
 <div class="container">
     <div class="row">
         <!-- 标题及作者 -->
-        <h1 class="col-12 mt-4 mb-4">{{ article.title }}</h1>
-        <div class="col-12 alert alert-success">
-            <div>
-                作者：{{ article.author }}
-                {% if user == article.author or user.is_superuser %}
-                    · <a href="{% url "article:article_update" article.id %}">
-                        编辑文章
-                    </a>
-                    · <a href="#" onclick="confirm_delete()">删除文章</a>
-                {% endif %}
+        <div class="col-10 {% if 'li' in toc %}offset-2{% else %}offset-1{% endif %}">
+            <h1 class="mt-4 mb-4">{{ article.title }}</h1>
+            <div class="alert alert-success">
+                <div>
+                    作者：{{ article.author }}
+                    {% if user == article.author or user.is_superuser %}
+                        · <a href="{% url "article:article_update" article.id %}">
+                            编辑文章
+                        </a>
+                        · <a href="#" onclick="confirm_delete()">删除文章</a>
+                    {% endif %}
+                </div>
+                <div>
+                    浏览：{{ article.total_views }}
+                </div>
+                <!-- 11 隐藏的安全删除表单 -->
+                <form 
+                    style="display:none;" 
+                    id="safe_delete"
+                    action="{% url 'article:article_safe_delete' article.id %}" 
+                    method="POST"
+                    >
+                    {% csrf_token %}
+                    <button type="submit">发送</button>
+                </form>
             </div>
-            <div>
-                浏览：{{ article.total_views }}
-            </div>
-            <!-- 11 隐藏的安全删除表单 -->
-            <form 
-                style="display:none;" 
-                id="safe_delete"
-                action="{% url 'article:article_safe_delete' article.id %}" 
-                method="POST"
-                >
-                {% csrf_token %}
-                <button type="submit">发送</button>
-            </form>
         </div>
+
+        <!-- 目录 -->
+        {% if 'li' in toc %}
+        <div class="col-2" id="sidebar" class="sidebar">
+            <div class="sidebar-sticky">
+                <hr class="mt-0">
+                <h4 class="text-center"><strong>目录</strong></h4>
+                <hr>
+                <div>
+                    {{ toc|safe }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
         <!-- 文章正文 -->
-        <div class="col-12">
+        <div class="col-10 {% if 'li' not in toc %}offset-1{% endif %}"> 
             <p>{{ article.body|safe }}</p>
         </div>
     </div>
