@@ -21,6 +21,9 @@ class ArticlePost(models.Model):
     # 04 文章更新时间，参数auto_now指定每次数据更新时自动写入当前时间
     updated = models.DateTimeField(auto_now=True)
 
+    # 20 浏览量
+    total_views = models.PositiveIntegerField(default=0)
+
     ## 04 规范表行为
     # 04 内部类class meta用来给model定义元数据
     # 04 元数据是**“任何不是字段的东西”**，例如排序选项ordering、数据库表名db_table、单数和复数名称verbose_name和 verbose_name_plural。这些信息不是某篇文章私有的数据，而是整张表的共同行为。

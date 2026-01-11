@@ -22,7 +22,12 @@
         <!-- 卡片容器 -->
             <div class="card h-100">
                 <!-- 标题 -->
-                <h4 class="card-header">{{ article.title }}</h4>
+                <h4 class="card-header d-flex justify-content-between align-items-end">
+                    <span style="word-break: break-all">{{ article.title }}</span>
+                    <small style="color: gray; font-size: 14px; margin-left: 20px; flex-shrink: 0;">
+                        浏览:{{ article.total_views }}
+                    </small>
+                </h4>
                 <!-- 06 模板变量 (Variables) - {{ ... }}-->
                 <!-- 06 用来输出变量的值到页面上-->
                 <!-- 摘要 -->
