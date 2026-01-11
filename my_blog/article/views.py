@@ -18,12 +18,21 @@ from django.contrib.auth.decorators import login_required
 # 06 导入数据模型
 from .models import ArticlePost
 
+# 19 分页模块
+from django.core.paginator import Paginator
+
 # 05 主页视图函数，返回HttpResponse对象或者抛出异常，request参数与请求类型有关
 def article_list(request):
     # # 05 返回最简单的网页
     # return HttpResponse("Hello World!")
     # 06 从数据库取出所有的博客文章
-    articles = ArticlePost.objects.all()
+    article_list = ArticlePost.objects.all()
+    # 19 每页一篇文章
+    paginator = Paginator(article_list,6)
+    # 19 从url中'?page=value'中获取page的值，没有这个会直接返回None
+    page = request.GET.get('page')
+    # 19 将页码对应的文章返回给articles，page为None返回1
+    articles = paginator.get_page(page)
     # 06 context字典定义了要传递给模板的上下文
     context = {'articles':articles}
     # 06 render函数结合模板与上下文并返回渲染后的HttpResponse对象
