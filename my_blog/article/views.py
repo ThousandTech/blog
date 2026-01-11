@@ -25,16 +25,23 @@ from django.core.paginator import Paginator
 def article_list(request):
     # # 05 返回最简单的网页
     # return HttpResponse("Hello World!")
-    # 06 从数据库取出所有的博客文章
-    article_list = ArticlePost.objects.all()
+    # 21 根据不同的参数返回不同顺序的列表
+    if request.GET.get('order') == 'total_views':
+        article_list = ArticlePost.objects.all().order_by('-total_views')
+        # 21 order用来传递给模板，在切换页时保持不同的排序
+        order = 'total_views'
+    else:
+        # 06 从数据库取出所有的博客文章
+        article_list = ArticlePost.objects.all()
+        order = 'normal'
     # 19 每页一篇文章
-    paginator = Paginator(article_list,6)
+    paginator = Paginator(article_list,3)
     # 19 从url中'?page=value'中获取page的值，没有这个会直接返回None
     page = request.GET.get('page')
     # 19 将页码对应的文章返回给articles，page为None返回1
     articles = paginator.get_page(page)
     # 06 context字典定义了要传递给模板的上下文
-    context = {'articles':articles}
+    context = {'articles':articles,'order':order}
     # 06 render函数结合模板与上下文并返回渲染后的HttpResponse对象
     # 06 render的三个参数分别为固定的request，模板文件，传入模板文件的上下文（字典）
     return render(request,'article/list.html',context)
