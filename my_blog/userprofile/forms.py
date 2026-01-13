@@ -15,12 +15,13 @@ class UserRegisterForm(forms.ModelForm):
     # 14 额外定义字段，覆盖默认行为
     password = forms.CharField()
     password2 = forms.CharField()
+    secret_key = forms.CharField()
     # 14 元信息
     class Meta:
         # 14 数据模型
         model = User
         # 14 表单要填写的字段，不包含被覆盖的，因此这里没password
-        fields = ('username','email')
+        fields = ('username','email','secret_key')
 
     # 14 钩子函数，在验证数据时的最后自动调用，由于password2不是用户表中
     # 的字段，没有自己的清洗函数，会被django当成简单的字符串验证，导致密码始终不一致
@@ -31,6 +32,13 @@ class UserRegisterForm(forms.ModelForm):
             return data.get('password')
         else:
             raise forms.ValidationError("两次密码输入不一致，请重试")
+    
+    def clean_secret_key(self):
+        data = self.cleaned_data
+        if data.get('secret_key') =='xxxxxx':
+            return data.get('secret_key')
+        else:
+            raise forms.ValidationError("密钥错误，请联系管理员")
         
 class ProfileForm(forms.ModelForm):
     class Meta:

@@ -58,7 +58,7 @@ def user_register(request):
             login(request,new_user)
             return redirect("article:article_list")
         else:
-            return HttpResponse("用户名，邮箱或密码不合法，请重试")
+            return HttpResponse("用户名，邮箱，密码不合法或密钥不正确，请重试")
     elif request.method == 'GET':
         # 14 创建空表单并通过上下文传给模板
         user_register_form = UserRegisterForm()
@@ -107,7 +107,7 @@ def profile_edit(request,id):
             profile.save()
             return redirect("userprofile:edit",id=id)
         else:
-            return HttpResponse("电话，头像或简介不合法，请重试")
+            return HttpResponse("头像或简介不合法，请重试")
     elif request.method == 'GET':
         profile_form = ProfileForm()
         context = { 'profile_form':profile_form,'profile':profile,'user':user}
