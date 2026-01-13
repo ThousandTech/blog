@@ -11,3 +11,5 @@ db.sqlite3
 
 # media files
 media/
+
+secret_key.txt
