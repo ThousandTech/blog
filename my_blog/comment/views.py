@@ -3,9 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 
 from article.models import ArticlePost
+from .models import Comment
 from .forms import CommentForm
 
-@login_required
+@login_required(login_url='/userprofile/login/')
 def post_comment(request,article_id):
     # 24 找不到对应的文章对象时返回404而非500
     article = get_object_or_404(ArticlePost,id = article_id)
@@ -22,3 +23,17 @@ def post_comment(request,article_id):
             return HttpResponse("表单内容有误，请重新填写")
     else:
         return HttpResponse("此操作仅允许POST请求")
+    
+@login_required(login_url='/userprofile/login/')
+def delete_comment(request,comment_id):
+    comment = get_object_or_404(Comment,id = comment_id)
+    article = get_object_or_404(ArticlePost,id = comment.article.id)
+    if request.method == 'POST':
+        if request.user == comment.user or request.user == article.author or request.user.is_superuser:
+            comment.delete()
+            return redirect(article)
+        else:
+            return HttpResponse('<script>alert("此操作仅允许评论者，文章作者与管理员使用");window.history.back();</script>')
+    else:
+        return HttpResponse('<script>alert("此操作仅允许POST请求");window.history.back();</script>')
+

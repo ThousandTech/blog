@@ -123,6 +123,19 @@
                         <span style="color: green">
                             {{ comment.created|date:"Y-m-d H:i:s" }}
                         </span> 时发表：
+                        
+                        {% if user == comment.user or user == article.author or user.is_superuser %}
+                            <a href="#" onclick="confirm_delete_comment('{{ comment.id }}')">删除</a>
+                            <form 
+                                style="display:none;" 
+                                id="safe_delete_comment_{{ comment.id }}" 
+                                action="{% url 'comment:delete_comment' comment.id %}" 
+                                method="POST"
+                            >
+                                {% csrf_token %}
+                                <button type="submit">发送</button>
+                            </form>
+                        {% endif %}
                     </p>
                     <pre style="font-family: inherit; font-size: 1em;">{{ comment.body }}</pre>
                 {% endfor %}
@@ -132,6 +145,18 @@
 </div>
 
 <script>
+    // 24 删除评论的函数
+    function confirm_delete_comment(comment_id) {
+        layer.open({
+            title: "确认删除",
+            content: "确认删除该评论吗？",
+            yes: function(index, layero) {
+                $('form#safe_delete_comment_' + comment_id + ' button').click();
+                layer.close(index);
+            }
+        })
+    }
+
     // 11 删除文章的函数原始版
     function confirm_delete() {
         // 调用layer弹窗组件
