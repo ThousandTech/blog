@@ -11,7 +11,7 @@
 {% block content %}
 <style> 
     .sidebar-sticky div > ul {
-         padding-left: 0;
+         padding-left: 20px;
     }
     .sidebar-sticky ul ul {
         padding-left: 1.2em;
@@ -22,13 +22,34 @@
     .sidebar-sticky a:hover {
         color: black;
     }
+    /* 侧边栏及目录样式结束 */
+    
+    /* 文章样式 */
+    /* 标题换行 */
+    h1 {
+        word-break: break-all;
+    }
+    /* 正文换行 */
+    .article-content {
+        word-break: break-all;
+    }
+    /* 代码块不换行，保持水平滚动 */
+    .article-content pre {
+        word-break: normal;
+        overflow-x: auto;
+    }
+    /* 图片自适应 */
+    .article-content img {
+        max-width: 100%;
+        height: auto;
+    }
 </style>
 
 <!-- 文章详情 -->
 <div class="container">
     <div class="row">
         <!-- 标题及作者 -->
-        <div class="col-10 {% if 'li' in toc %}offset-2{% else %}offset-1{% endif %}">
+        <div class="col-12 col-md-10 {% if 'li' in toc %}offset-md-2{% else %}offset-md-1{% endif %}">
             <h1 class="mt-4 mb-4">{{ article.title }}</h1>
             <div class="alert alert-success">
                 <div>
@@ -58,12 +79,19 @@
 
         <!-- 目录 -->
         {% if 'li' in toc %}
-        <div class="col-2" id="sidebar" class="sidebar">
+        <div class="col-12 col-md-2" id="sidebar" class="sidebar">
             <div class="sidebar-sticky">
                 <hr class="mt-0">
-                <h4 class="text-center"><strong>目录</strong></h4>
-                <hr>
-                <div>
+                <h4 class="text-center d-none d-md-block"><strong>目录</strong></h4>
+                
+                <!-- 移动端目录折叠按钮 -->
+                <button class="btn btn-secondary d-md-none mb-3 w-100" type="button" data-toggle="collapse" data-target="#tocCollapse" aria-expanded="false" aria-controls="tocCollapse">
+                    查看目录
+                </button>
+
+                <hr class="d-none d-md-block">
+                
+                <div id="tocCollapse" class="collapse d-md-block">
                     {{ toc|safe }}
                 </div>
             </div>
@@ -71,12 +99,12 @@
         {% endif %}
         
         <!-- 文章正文 -->
-        <div class="col-10 {% if 'li' not in toc %}offset-1{% endif %}"> 
-            <p>{{ article.body|safe }}</p>
+        <div class="col-12 col-md-10 {% if 'li' not in toc %}offset-md-1{% endif %} article-content"> 
+            {{ article.body|safe }}
         </div>
 
         <!-- 发表评论 -->
-        <div class="col-10 {% if 'li' in toc %}offset-2{% else %}offset-1{% endif %}">
+        <div class="col-12 col-md-10 {% if 'li' in toc %}offset-md-2{% else %}offset-md-1{% endif %}">
             <hr>
             {% if user.is_authenticated %}
                 <div>
@@ -137,7 +165,7 @@
                             </form>
                         {% endif %}
                     </p>
-                    <pre style="font-family: inherit; font-size: 1em;">{{ comment.body }}</pre>
+                    <pre style="font-family: inherit; font-size: 1em; white-space: pre-wrap; word-break: break-all;">{{ comment.body }}</pre>
                 {% endfor %}
             </div>
         </div>

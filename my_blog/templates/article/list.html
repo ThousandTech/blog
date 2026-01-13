@@ -10,12 +10,19 @@
 
 <!-- 07 写入 base.html 中定义的 content -->
 {% block content %}
+<style>
+    @media (max-width: 576px) {
+        .breadcrumb-search input {
+            max-width: 160px;
+        }
+    }
+</style>
 
 <!-- 定义放置文章标题的div容器 -->
 <div class="container">
     <br>
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb align-items-center">
+        <ol class="breadcrumb align-items-center flex-nowrap">
             <li class="breadcrumb-item" style="font-size: 1.2rem;">
                 <a href="{% url 'article:article_list' %}?search={{ search }}"
                     {% if order == 'normal' %}
@@ -38,8 +45,8 @@
             </li>
 
             <!-- 搜索栏 -->
-            <li class="ml-auto">
-                <form class="form-inline" >
+            <li class="ml-auto breadcrumb-search">
+                <form class="form-inline my-2 my-lg-0" >
                     <div class="input-group">
                         <input type="text" 
                             class="form-control" 
@@ -71,7 +78,7 @@
         {% for article in articles %}
         <!-- 06 循环开始-->
         <!-- 文章内容 -->
-        <div class="col-4 mb-4">
+        <div class="col-12 col-md-4 mb-4">
         <!-- 卡片容器 -->
             <div class="card h-100">
                 <!-- 标题 -->
