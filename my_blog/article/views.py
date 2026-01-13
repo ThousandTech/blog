@@ -24,6 +24,9 @@ from django.core.paginator import Paginator
 # 22 用来查询的Q对象
 from django.db.models import Q
 
+# 24 评论模型
+from comment.models import Comment
+
 # 05 主页视图函数，返回HttpResponse对象或者抛出异常，request参数与请求类型有关
 def article_list(request):
     # # 05 返回最简单的网页
@@ -71,6 +74,8 @@ def article_list(request):
 def article_detail(request,id):
 
     article = ArticlePost.objects.get(id=id)
+    # 24 取出所有此文章的评论
+    comments = Comment.objects.filter(article=id)
 
     article.total_views += 1
     article.save(update_fields=['total_views'])
@@ -86,7 +91,7 @@ def article_detail(request,id):
     
     article.body = md.convert(article.body)
 
-    context = {'article':article,'toc':md.toc}
+    context = {'article':article,'toc':md.toc,'comments':comments}
 
     return render(request,'article/detail.html',context)
 

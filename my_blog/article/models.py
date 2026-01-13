@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 # 04 导入timezone模块以处理时间相关操作
 
+from django.urls import reverse
+
 class ArticlePost(models.Model):
     ## 04 定义文章表的结构
     # 04 文章作者，外键，on_delete参数使文章作者注销时一并删除此文章
@@ -35,3 +37,7 @@ class ArticlePost(models.Model):
     def __str__(self):
         # 04 返回文章标题
         return self.title
+    
+    def get_absolute_url(self):
+        # 24 反向解析函数，生成URL地址
+        return reverse('article:article_detail',args=[self.id])

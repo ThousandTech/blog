@@ -29,6 +29,7 @@ urlpatterns = [
     path('userprofile/',include('userprofile.urls',namespace='userprofile')),
     # 16 重置密码路由
     path('password-reset/',include('password_reset.urls')),
+    path('comment/',include('comment.urls',namespace='comment')),
 ]
 
 #头像URL
