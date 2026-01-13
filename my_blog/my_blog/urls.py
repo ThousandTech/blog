@@ -17,8 +17,10 @@ from django.contrib import admin
 from django.urls import path,include# 03引入include函数
 from django.conf import settings
 from django.conf.urls.static import static
+import article.views
 
 urlpatterns = [
+    path('', article.views.article_list, name='home'), # 首页直接显示文章列表
     path('admin/', admin.site.urls),
     # 03 告诉django怎样定位article应用
     # 03 'article/'参数分配了一个URL前缀给article应用
