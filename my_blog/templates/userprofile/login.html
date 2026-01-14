@@ -2,6 +2,83 @@
 {% load staticfiles %}
 {% block title %} 登录 {% endblock title %}
 {% block content %}
+<style>
+    :root {
+        --bg: #0f1216;
+        --surface: #151a21;
+        --surface-soft: #1c222b;
+        --border: #252c35;
+        --text: #e8ecf1;
+        --muted: #9aa3b0;
+        --accent: #7cc5ff;
+        --success: #9fe870;
+    }
+
+    html { overflow-y: scroll; }
+
+    body {
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    a { color: var(--accent); }
+    a:hover { color: #b2ddff; }
+
+    .container { flex: 1; }
+
+    .form-control {
+        background: var(--surface-soft) !important;
+        border: 1px solid var(--border) !important;
+        color: var(--text) !important;
+    }
+
+    .form-control:focus {
+        background: var(--surface-soft) !important;
+        border-color: var(--accent) !important;
+        color: var(--text) !important;
+        box-shadow: 0 0 0 0.2rem rgba(124,197,255,0.25) !important;
+    }
+
+    .form-control::placeholder {
+        color: var(--muted) !important;
+    }
+
+    /* 覆盖浏览器自动填充样式 */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active {
+        -webkit-box-shadow: 0 0 0 30px var(--surface-soft) inset !important;
+        -webkit-text-fill-color: var(--text) !important;
+        caret-color: var(--text) !important;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+
+    label { color: var(--text); }
+
+    .btn-primary,
+    .btn-info {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #0c0f14;
+        font-weight: 600;
+    }
+
+    .btn-primary:hover,
+    .btn-info:hover {
+        background: #b2ddff;
+        border-color: #b2ddff;
+    }
+
+    .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text);
+    }
+</style>
 <div class="container">
     <div class="row justify-content-center align-items-center" style="min-height: 75vh">
         <div class="col-12 col-md-5 col-lg-4">

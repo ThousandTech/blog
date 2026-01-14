@@ -34,28 +34,58 @@ def article_list(request):
     order = request.GET.get('order')
     # 22 搜索参数
     search = request.GET.get('search')
+    # 27 专栏参数
+    column_id = request.GET.get('column')
+    # if search:
+    #     if column_id:
+    #         if order == 'total_views':
+    #             article_list = ArticlePost.objects.filter(
+    #                 # 22 忽略大小写查询数据库，标题或正文有关键词就被选出
+    #                 Q(title__icontains=search)|
+    #                 Q(body__icontains=search),
+    #                 column = ArticleColumn.objects.get(id=column_id)
+    #             ).order_by('-total_views')
+    #         else:
+    #             article_list = ArticlePost.objects.filter(
+    #                 Q(title__icontains=search)|
+    #                 Q(body__icontains=search),
+    #                 column = ArticleColumn.objects.get(id=column_id)
+    #             )
+    #             order = 'normal'
+    # else:
+    #     # 22 没有搜索参数会返回None，此处将search置为空字符串，防止检索None这个字符串
+    #     search = ''
+    #     # 21 根据不同的参数返回不同顺序的列表
+    #     if order == 'total_views':
+    #         article_list = ArticlePost.objects.all().order_by('-total_views')
+    #     else:
+    #         article_list = ArticlePost.objects.all()
+    #         order = 'normal'
+    article_list = ArticlePost.objects.all()
+
+    # 1. 搜索
     if search:
-        if order == 'total_views':
-            article_list = ArticlePost.objects.filter(
-                # 22 忽略大小写查询数据库，标题或正文有关键词就被选出
-                Q(title__icontains=search)|
-                Q(body__icontains=search)
-            ).order_by('-total_views')
-        else:
-            article_list = ArticlePost.objects.filter(
-                Q(title__icontains=search)|
-                Q(body__icontains=search)
-            )
-            order = 'normal'
+        article_list = article_list.filter(
+            Q(title__icontains=search) |
+            Q(body__icontains=search)
+        )
     else:
-        # 22 没有搜索参数会返回None，此处将search置为空字符串，防止检索None这个字符串
         search = ''
-        # 21 根据不同的参数返回不同顺序的列表
-        if order == 'total_views':
-            article_list = ArticlePost.objects.all().order_by('-total_views')
-        else:
-            article_list = ArticlePost.objects.all()
-            order = 'normal'
+
+    # 2. 栏目
+    if column_id == 'uncategorized':
+        # 27 找到所有没有专栏的文章
+        article_list = article_list.filter(column__isnull=True)
+    elif column_id and column_id != 'None':
+        article_list = article_list.filter(column=ArticleColumn.objects.get(id=column_id))
+
+    # 3. 排序
+    if order == 'total_views':
+        article_list = article_list.order_by('-total_views')
+    else:
+        article_list = article_list.order_by('-updated')
+        order = 'normal'
+
 
     # 19 每页3篇文章
     paginator = Paginator(article_list,3)
@@ -63,9 +93,16 @@ def article_list(request):
     page = request.GET.get('page')
     # 19 将页码对应的文章返回给articles，page为None返回1
     articles = paginator.get_page(page)
+    columns = ArticleColumn.objects.all()
+    uncategorized_count = ArticlePost.objects.filter(column__isnull=True).count()
+    # 获取Thousand用户信息用于个人卡片展示
+    try:
+        profile_user = User.objects.get(id=6)
+    except User.DoesNotExist:
+        profile_user = None
     # 06 context字典定义了要传递给模板的上下文
     # 21 order用来传递给模板，在切换页时保持不同的排序
-    context = {'articles':articles,'order':order,'search':search}
+    context = {'articles':articles,'order':order,'search':search,'columns':columns,'column':column_id,'uncategorized_count':uncategorized_count,'profile_user':profile_user}
     # 06 render函数结合模板与上下文并返回渲染后的HttpResponse对象
     # 06 render的三个参数分别为固定的request，模板文件，传入模板文件的上下文（字典）
     return render(request,'article/list.html',context)

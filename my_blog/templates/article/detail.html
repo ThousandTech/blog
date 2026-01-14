@@ -9,7 +9,48 @@
 
 <!-- 写入 base.html 中定义的 content -->
 {% block content %}
-<style> 
+<style>
+    :root {
+        --bg: #0f1216;
+        --surface: #151a21;
+        --surface-soft: #1c222b;
+        --border: #252c35;
+        --text: #e8ecf1;
+        --muted: #9aa3b0;
+        --accent: #7cc5ff;
+        --success: #9fe870;
+    }
+
+    html {
+        overflow-y: scroll;
+    }
+
+    body {
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    a {
+        color: var(--accent);
+    }
+
+    a:hover {
+        color: #b2ddff;
+    }
+
+    .container {
+        flex: 1;
+    }
+
+    .alert-success {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text);
+    }
+
     .sidebar-sticky div > ul {
          padding-left: 20px;
     }
@@ -17,31 +58,107 @@
         padding-left: 1.2em;
     }
     .sidebar-sticky a {
-        color: #0056b3;
+        color: var(--accent);
     }
     .sidebar-sticky a:hover {
-        color: black;
+        color: #b2ddff;
     }
-    /* 侧边栏及目录样式结束 */
     
-    /* 文章样式 */
-    /* 标题换行 */
     h1 {
         word-break: break-all;
+        color: var(--text);
     }
-    /* 正文换行 */
+    
     .article-content {
         word-break: break-all;
+        color: var(--text);
     }
-    /* 代码块不换行，保持水平滚动 */
+    
     .article-content pre {
         word-break: normal;
         overflow-x: auto;
+        background: #1a2332;
+        border: none;
     }
-    /* 图片自适应 */
+
+    /* 代码高亮块统一背景与内边距 */
+    .codehilite,
+    .codehilite pre,
+    .codehilite code {
+        background: #1a2332 !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 10px 12px !important;
+        color: var(--text) !important;
+        margin: 0 !important;
+    }
+
+    .codehilite {
+        margin: 12px 0 !important;
+    }
+
+    .codehilite:before,
+    .codehilite:after {
+        display: none !important;
+        content: none !important;
+    }
+    
     .article-content img {
         max-width: 100%;
         height: auto;
+    }
+
+    .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text);
+    }
+
+    hr {
+        border-color: var(--border);
+    }
+
+    /* 评论输入框深色主题 */
+    #body {
+        background: var(--surface-soft);
+        border: 1px solid var(--border);
+        color: var(--text);
+    }
+
+    #body:focus {
+        background: var(--surface-soft);
+        border-color: var(--accent);
+        color: var(--text);
+        box-shadow: 0 0 0 0.2rem rgba(124, 197, 255, 0.25);
+    }
+
+    #body::placeholder {
+        color: var(--muted);
+    }
+
+    /* 评论内容样式 */
+    .comment-body {
+        color: var(--text);
+        background: transparent;
+        font-family: inherit;
+        font-size: 1em;
+        white-space: pre-wrap;
+        word-break: break-all;
+        border: none;
+        padding: 0;
+    }
+
+    .comment-meta {
+        color: var(--muted);
+    }
+
+    .comment-user {
+        color: #ff9ff3;
+        font-weight: bold;
+    }
+
+    .comment-time {
+        color: var(--success);
     }
 </style>
 
@@ -144,15 +261,17 @@
             <div>
                 {% for comment in comments %}
                     <hr>
-                    <p>
-                        <strong style="color: pink">
+                    <p class="comment-meta">
+                        <strong class="comment-user">
                             {{ comment.user }}
                         </strong> 于 
-                        <span style="color: green">
+                        <span class="comment-time">
                             {{ comment.created|date:"Y-m-d H:i:s" }}
                         </span> 时发表：
-                        
-                        {% if user == comment.user or user == article.author or user.is_superuser %}
+                    </p>
+                    <pre class="comment-body">{{ comment.body }}</pre>
+                    {% if user == comment.user or user == article.author or user.is_superuser %}
+                        <p>
                             <a href="#" onclick="confirm_delete_comment('{{ comment.id }}')">删除</a>
                             <form 
                                 style="display:none;" 
@@ -163,9 +282,8 @@
                                 {% csrf_token %}
                                 <button type="submit">发送</button>
                             </form>
-                        {% endif %}
-                    </p>
-                    <pre style="font-family: inherit; font-size: 1em; white-space: pre-wrap; word-break: break-all;">{{ comment.body }}</pre>
+                        </p>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>
@@ -178,8 +296,12 @@
         layer.open({
             title: "确认删除",
             content: "确认删除该评论吗？",
+            btn: ['确认', '取消'],
             yes: function(index, layero) {
                 $('form#safe_delete_comment_' + comment_id + ' button').click();
+                layer.close(index);
+            },
+            no: function(index) {
                 layer.close(index);
             }
         })
@@ -193,25 +315,34 @@
             title: "确认删除",
             // 正文
             content: "确认删除这篇文章吗？",
+            // 按钮配置
+            btn: ['确认', '取消'],
             // 点击确定按钮后调用的回调函数
             yes: function(index, layero) {
                 // 指定应当前往的 url
                 // location.href='{#% url "article:article_delete" article.id %#}';
                 alert("请使用安全删除功能");
             },
+            no: function(index) {
+                layer.close(index);
+            }
         })
     }
     // 11 删除文章的函数安全版
     function confirm_safe_delete() {
-    layer.open({
-        title: "确认删除",
-        content: "确认删除这篇文章吗？",
-        yes: function(index, layero) {
-            $('form#safe_delete button').click();
-            layer.close(index);
-        }
-    })
-}
+        layer.open({
+            title: "确认删除",
+            content: "确认删除这篇文章吗？",
+            btn: ['确认', '取消'],
+            yes: function(index, layero) {
+                $('form#safe_delete button').click();
+                layer.close(index);
+            },
+            no: function(index) {
+                layer.close(index);
+            }
+        })
+    }
 </script>
 
 {% endblock content %}

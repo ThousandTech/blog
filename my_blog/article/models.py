@@ -56,7 +56,7 @@ class ArticlePost(models.Model):
     # 04 元数据是**“任何不是字段的东西”**，例如排序选项ordering、数据库表名db_table、单数和复数名称verbose_name和 verbose_name_plural。这些信息不是某篇文章私有的数据，而是整张表的共同行为。
     class Meta:
         # 表示按创建顺序倒序输出
-        ordering = ('-created',)
+        ordering = ('-updated',)
 
     # 04 函数__str__定义返回值内容，在将对象转为字符串时自动调用
     def __str__(self):

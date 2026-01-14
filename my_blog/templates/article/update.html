@@ -1,6 +1,75 @@
 {% extends "base.html" %} {% load staticfiles %}
 {% block title %} 更新文章 {% endblock title %}
 {% block content %}
+<style>
+    :root {
+        --bg: #0f1216;
+        --surface: #151a21;
+        --surface-soft: #1c222b;
+        --border: #252c35;
+        --text: #e8ecf1;
+        --muted: #9aa3b0;
+        --accent: #7cc5ff;
+        --success: #9fe870;
+    }
+
+    html {
+        overflow-y: scroll;
+    }
+
+    body {
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    a {
+        color: var(--accent);
+    }
+
+    a:hover {
+        color: #b2ddff;
+    }
+
+    .container {
+        flex: 1;
+    }
+
+    .form-control {
+        background: var(--surface-soft);
+        border: 1px solid var(--border);
+        color: var(--text);
+    }
+
+    .form-control:focus {
+        background: var(--surface-soft);
+        border-color: var(--accent);
+        color: var(--text);
+        box-shadow: 0 0 0 0.2rem rgba(124, 197, 255, 0.25);
+    }
+
+    .form-control::placeholder {
+        color: var(--muted);
+    }
+
+    label {
+        color: var(--text);
+    }
+
+    .btn-primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #0c0f14;
+        font-weight: 600;
+    }
+
+    .btn-primary:hover {
+        background: #b2ddff;
+        border-color: #b2ddff;
+    }
+</style>
 <div class="container">
     <div class="row">
         <div class="col-12">

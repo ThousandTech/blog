@@ -5,158 +5,485 @@
 
 <!-- 07 写入 base.html 中定义的 title -->
 {% block title %}
-    首页
+    Thousand的个人站
 {% endblock title %}
 
 <!-- 07 写入 base.html 中定义的 content -->
 {% block content %}
 <style>
+    :root {
+        --bg: #0f1216;
+        --surface: #151a21;
+        --surface-soft: #1c222b;
+        --border: #252c35;
+        --text: #e8ecf1;
+        --muted: #9aa3b0;
+        --accent: #7cc5ff;
+        --success: #9fe870;
+        --sidebar-width: 280px;
+        --profile-card-height: 260px;
+    }
+
+    html {
+        overflow-y: scroll;
+    }
+
+    body {
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    a {
+        color: var(--accent);
+    }
+
+    a:hover {
+        color: #b2ddff;
+    }
+
+    .layout-shell {
+        padding: 28px 0 32px;
+        flex: 1;
+    }
+
+    .custom-container {
+        padding-left: 12px;
+        padding-right: 12px;
+        margin-left: 0;
+        margin-right: 0;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .content-grid {
+        display: grid;
+        grid-template-columns: var(--sidebar-width) minmax(0, 1fr) var(--sidebar-width);
+        gap: 24px;
+        align-items: start;
+    }
+
+    .card-panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px 20px;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+
+    .profile-card {
+        min-height: var(--profile-card-height);
+    }
+
+    .sidebar-placeholder {
+        height: calc(var(--profile-card-height) * 1.5);
+    }
+
+    .profile-card .avatar-circle {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        margin: 0 auto;
+        background: linear-gradient(135deg, #78ffd6, #7cc5ff);
+        display: grid;
+        place-items: center;
+        color: #0c0f14;
+        font-weight: 700;
+        font-size: 28px;
+    }
+
+    .profile-card .stat-number {
+        font-weight: 700;
+        font-size: 18px;
+    }
+
+    .profile-card .stat-label {
+        color: var(--muted);
+        font-size: 12px;
+    }
+
+    .social-links {
+        gap: 16px;
+    }
+
+    .social-icon {
+        color: var(--muted);
+        transition: color 0.2s ease;
+    }
+
+    .social-icon:hover {
+        color: var(--accent);
+    }
+
+    .category-link {
+        color: var(--text);
+        text-decoration: none;
+    }
+
+    .category-link:hover {
+        color: var(--accent);
+    }
+
+    .pill {
+        background: var(--surface-soft);
+        color: var(--muted);
+        border-radius: 10px;
+        padding: 2px 10px;
+        font-size: 12px;
+    }
+
+    .feed-nav {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 16px;
+    }
+
+    .feed-nav .breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin: 0;
+    }
+
+    .feed-nav .breadcrumb-item a {
+        color: var(--text);
+        font-weight: 600;
+    }
+
+    .feed-nav .breadcrumb-item a.text-muted {
+        color: var(--muted) !important;
+    }
+
+    .feed-nav .breadcrumb-item + .breadcrumb-item::before {
+        content: '';
+        padding: 0;
+    }
+
+    .feed-tab {
+        padding: 6px 14px;
+        border-radius: 12px;
+        text-decoration: none;
+        display: inline-block;
+        color: var(--muted);
+        transition: all 0.2s ease;
+    }
+
+    .feed-tab:hover {
+        color: #b2ddff;
+        text-decoration: none;
+    }
+
+    .feed-tab.active {
+        background: var(--accent);
+        color: #0c0f14 !important;
+        font-weight: 700;
+        pointer-events: none;
+    }
+
+    .feed-search input {
+        background: var(--surface-soft);
+        border: 1px solid var(--border);
+        color: var(--text);
+    }
+
+    .feed-search input::placeholder {
+        color: #6f7783;
+    }
+
+    .feed-search .btn-primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #0c0f14;
+        font-weight: 600;
+    }
+
+    .article-card {
+        margin-bottom: 16px;
+    }
+
+    .article-card h4 {
+        margin-bottom: 10px;
+    }
+
+    .article-card .article-title a {
+        color: var(--text);
+        text-decoration: none;
+        display: inline-block;
+        max-width: 100%;
+    }
+
+    .article-card .article-title a:hover {
+        color: var(--accent);
+    }
+
+    .article-meta {
+        color: var(--muted);
+        font-size: 14px;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+
+    .article-meta span + span {
+        margin-left: 12px;
+    }
+
+    .pagination .btn {
+        border-radius: 10px;
+    }
+
+    .pagination-row {
+        margin-top: 12px;
+        margin-bottom: 0;
+    }
+
+    /* Color article tags per column using a hue derived from the column id */
+    .column-tag {
+        color: hsl(var(--hue, 210), 60%, 20%);
+        background-color: hsl(var(--hue, 210), 70%, 88%);
+        border-color: hsl(var(--hue, 210), 70%, 76%);
+        font-weight: 600;
+    }
+
+    .column-tag:hover {
+        color: hsl(var(--hue, 210), 60%, 16%);
+        background-color: hsl(var(--hue, 210), 70%, 84%);
+        border-color: hsl(var(--hue, 210), 70%, 70%);
+    }
+
+    @media (max-width: 992px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
     @media (max-width: 576px) {
-        .breadcrumb-search input {
+        .feed-search input {
             max-width: 160px;
         }
     }
 </style>
 
-<!-- 定义放置文章标题的div容器 -->
-<div class="container">
-    <br>
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb align-items-center flex-nowrap">
-            <li class="breadcrumb-item" style="font-size: 1.2rem;">
-                <a href="{% url 'article:article_list' %}?search={{ search }}"
-                    {% if order == 'normal' %}
-                        class="text-muted" 
-                        style="pointer-events: none; text-decoration: none; cursor: default;"
-                    {% endif %}
-                >
-                    最新
-                </a>
-            </li>
-            <li class="breadcrumb-item" style="font-size: 1.2rem;">
-                <a href="{% url 'article:article_list' %}?order=total_views&search={{ search }}"
-                    {% if order == 'total_views' %}
-                        class="text-muted" 
-                        style="pointer-events: none; text-decoration: none; cursor: default;"
-                    {% endif %}
-                >
-                    最热
-                </a>
-            </li>
+<div class="layout-shell">
+    <div class="container-fluid custom-container">
+        <div class="content-grid">
+            <!-- 左侧：个人信息 + 分类 -->
+            <aside class="sidebar-left">
+                <div class="card-panel profile-card text-center mb-3">
+                    <div class="avatar-circle">
+                        {% if profile_user.profile.avatar %}
+                            <img src="{{ profile_user.profile.avatar.url }}" alt="{{ profile_user.username }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                        {% else %}
+                            <span>{{ profile_user.username|default:"T"|slice:":1"|upper }}</span>
+                        {% endif %}
+                    </div>
+                    <h5 class="mt-3 mb-1">{{ profile_user.username|default:"Thousand" }}</h5>
+                    <p class="text-muted mb-3">{{ profile_user.profile.bio|default:"Glad to meet you here, this is Thousand." }}</p>
+                    <p class="text-muted small mb-3" id="live-time" style="font-size: 0.85rem;"></p>
+                    <div class="social-links d-flex justify-content-center gap-3">
+                        <a href="https://github.com/ThousandTech" target="_blank" class="social-icon" title="GitHub">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                            </svg>
+                        </a>
+                        <a href="https://space.bilibili.com/452909274" target="_blank" class="social-icon" title="哔哩哔哩">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M17.813 4.653h.854c1.51.054 2.769.578 3.773 1.574 1.004.995 1.524 2.249 1.56 3.76v7.36c-.036 1.51-.556 2.769-1.56 3.773s-2.262 1.524-3.773 1.56H5.333c-1.51-.036-2.769-.556-3.773-1.56S.036 18.858 0 17.347v-7.36c.036-1.511.556-2.765 1.56-3.76 1.004-.996 2.262-1.52 3.773-1.574h.774l-1.174-1.12a1.234 1.234 0 0 1-.373-.906c0-.356.124-.658.373-.907l.027-.027c.267-.249.573-.373.92-.373.347 0 .653.124.92.373L9.653 4.44c.071.071.134.142.187.213h4.267a.836.836 0 0 1 .16-.213l2.853-2.747c.267-.249.573-.373.92-.373.347 0 .662.151.929.4.267.249.391.551.391.907 0 .355-.124.657-.373.906zM5.333 7.24c-.746.018-1.373.276-1.88.773-.506.498-.769 1.13-.786 1.894v7.52c.017.764.28 1.395.786 1.893.507.498 1.134.756 1.88.773h13.334c.746-.017 1.373-.275 1.88-.773.506-.498.769-1.129.786-1.893v-7.52c-.017-.765-.28-1.396-.786-1.894-.507-.497-1.134-.755-1.88-.773zM8 11.107c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c0-.373.129-.689.386-.947.258-.257.574-.386.947-.386zm8 0c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c.017-.391.15-.711.4-.96.249-.249.56-.373.933-.373Z"/>
+                            </svg>
+                        </a>
+                        <a href="mailto:{{ profile_user.email|default:'contact@example.com' }}" class="social-icon" title="邮箱">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
 
-            <!-- 搜索栏 -->
-            <li class="ml-auto breadcrumb-search">
-                <form class="form-inline my-2 my-lg-0" >
-                    <div class="input-group">
-                        <input type="text" 
-                            class="form-control" 
-                            name="search" 
-                            placeholder="搜索文章..." 
-                            required
-                        >
-                        <div class="input-group-append">
-                            <button class="btn btn-primary" type="submit">搜索</button>
+                <div class="card-panel category-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">分类</h6>
+                    </div>
+                    <ul class="list-unstyled mb-0">
+                        <li class="d-flex justify-content-between align-items-center mb-2">
+                            <a href="?column=uncategorized&search={{ search }}&order={{ order }}" class="category-link">未分类</a>
+                            <span class="pill">{{ uncategorized_count }}</span>
+                        </li>
+                        {% for col in columns %}
+                            <li class="d-flex justify-content-between align-items-center mb-2">
+                                <a href="?column={{ col.id }}&search={{ search }}&order={{ order }}" class="category-link">{{ col.title }}</a>
+                                <span class="pill">{{ col.article.count }}</span>
+                            </li>
+                        {% empty %}
+                            <li class="text-muted small">暂无分类</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- 中间：文章列表 -->
+            <main class="main-feed">
+                <div class="card-panel feed-nav">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb align-items-center flex-nowrap mb-0">
+                            <li class="breadcrumb-item" style="font-size: 1.1rem;">
+                                <a href="{% url 'article:article_list' %}?search={{ search }}&column={{ column }}"
+                                   class="feed-tab {% if order == 'normal' %}active{% endif %}">
+                                    最新
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item" style="font-size: 1.1rem;">
+                                <a href="{% url 'article:article_list' %}?order=total_views&search={{ search }}&column={{ column }}"
+                                   class="feed-tab {% if order == 'total_views' %}active{% endif %}">
+                                    最热
+                                </a>
+                            </li>
+                        </ol>
+                    </nav>
+
+                    <form class="form-inline feed-search" >
+                        <div class="input-group">
+                            <input type="text" 
+                                class="form-control" 
+                                name="search" 
+                                placeholder="搜索文章..."
+                                value="{{ search }}"
+                            >
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="submit">搜索</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                {% if search %}
+                    {% if articles %}
+                        <div class="card-panel mb-3" style="color: var(--muted);">
+                            <strong>“{{ search }}”</strong> 的搜索结果如下：
+                        </div>
+                    {% else %}
+                        <div class="card-panel mb-3" style="color: var(--muted);">
+                            暂无 “{{ search }}” 相关的文章。
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+                {% for article in articles %}
+                    <div class="card-panel article-card">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                {% if article.column %}
+                                    {% widthratio article.column.id 1 60 as hue %}
+                                    <a href="{% url 'article:article_list' %}?column={{ article.column.id }}&search={{ search }}" 
+                                        class="btn btn-sm column-tag"
+                                        style="--hue: {{ hue }};"
+                                    >
+                                        {{ article.column }}
+                                    </a>
+                                {% endif %}
+                            </div>
+                            <span class="article-meta">{{ article.updated|date:'Y-m-d' }} 更新</span>
+                        </div>
+
+                        <h4 class="article-title">
+                            <a href="{% url 'article:article_detail' article.id %}">
+                                {{ article.title }}
+                            </a>
+                        </h4>
+
+                        <p class="article-meta">{{ article.body|slice:'120' }}...</p>
+
+                        <div class="article-meta mt-2">
+                            <span>{{ article.total_views }} 浏览</span>
+                            <span>{{ article.created|date:'Y-m-d' }} 发布</span>
                         </div>
                     </div>
-                </form>
-            </li>
-        </ol>
-    </nav>
+                {% endfor %}
 
-    <!-- 新增，搜索提示语 -->
-    {% if search %}
-        {% if articles %}
-            <h4><span style="color: red">"{{ search }}"</span>的搜索结果如下：</h4>
-            <hr>        
-        {% else %}
-            <h4>暂无<span style="color: red">"{{ search }}"</span>有关的文章。</h4>
-            <hr>
-        {% endif %}
-    {% endif %}
-    <!-- 列表循环 -->
-    <div class="row mt-2">
-        {% for article in articles %}
-            <!-- 文章内容 -->
-            <div class="col-12">
-                <!-- 栏目 -->
-                {% if article.column %}
-                    <button type="button" 
-                        class="btn btn-sm mb-2
-                            {% if article.column.title == 'Django' %}
-                                btn-success
-                            {% elif article.column.title == 'Java' %}
-                                btn-danger
-                            {% elif article.column.title == 'HTML' %}
-                                btn-warning
+                <!-- 页码导航 -->
+                {% if articles.paginator.num_pages > 1 %}
+                <div class="pagination row pagination-row">
+                    <div class="m-auto">
+                        <span class="step-links">
+                            {% if articles.has_previous %}
+                                <a href="?page=1&order={{ order }}&search={{ search }}&column={{ column }}" class="btn btn-success">&laquo; 1</a>
+                                <span class="text-muted">...</span>
+                                <a href="?page={{ articles.previous_page_number }}&order={{ order }}&search={{ search }}&column={{ column }}" 
+                                class="btn btn-secondary"
+                                >
+                                    {{ articles.previous_page_number }}
+                                </a>
                             {% endif %}
-                        "
-                    >
-                        {{ article.column }}
-                    </button>
-                {% endif %}
-                <!-- 标题 -->
-                <h4>
-                    <b>
-                        <a href="{% url 'article:article_detail' article.id %}"
-                        style="color: black;" 
-                        >
-                            {{ article.title }}
-                        </a>
-                    </b>
-                </h4>
-                <!-- 摘要 -->
-                <div>
-                    <p style="color: gray;">
-                        {{ article.body|slice:'100' }}...
-                    </p>
+
+                            <span class="btn btn-primary btn-lg">
+                                {{ articles.number }}
+                            </span>
+
+                            {% if articles.has_next %}
+                                <a href="?page={{ articles.next_page_number }}&order={{ order }}&search={{ search }}&column={{ column }}"
+                                class="btn btn-secondary">{{ articles.next_page_number }}</a>
+                                <span class="text-muted">...</span>
+                                <a href="?page={{ articles.paginator.num_pages }}&order={{ order }}&search={{ search }}&column={{ column }}"
+                                class="btn btn-success">{{ articles.paginator.num_pages }} &raquo;</a>
+                            {% endif %}
+                        </span>
+                    </div>
                 </div>
-                <!-- 注脚 -->
-                <p>
-                    <!-- 附加信息 -->
-                    <span style="color: green;">
-                        {{ article.total_views }} 浏览&nbsp;&nbsp;&nbsp;
-                    </span>
-                    <span style="color: blue;">
-                        {{ article.created|date:'Y-m-d' }} 发布&nbsp;&nbsp;&nbsp;
-                    </span>
-                    <span style="color: darkred;">
-                        {{ article.updated|date:'Y-m-d' }} 更新
-                    </span>
-                </p>
-                <hr>
-            </div>
-        {% endfor %}
-    </div>
-    <!-- 页码导航 -->
-    <div class="pagination row">
-        <div class="m-auto">
-            <span class="step-links">
-                <!-- 如果不是第一页，则显示上翻按钮 -->
-                {% if articles.has_previous %}
-                    <a href="?page=1&order={{ order }}&search={{ search }}" class="btn btn-success">&laquo; 1</a>
-                    <span>...</span>
-                    <a href="?page={{ articles.previous_page_number }}&order={{ order }}&search={{ search }}" 
-                    class="btn btn-secondary"
-                    >
-                        {{ articles.previous_page_number }}
-                    </a>
                 {% endif %}
+            </main>
 
-                <!-- 当前页面 -->
-                <span class="btn btn-primary btn-lg">
-                    {{ articles.number }}
-                </span>
-
-                <!-- 如果不是最末页，则显示下翻按钮 -->
-                {% if articles.has_next %}
-                    <a href="?page={{ articles.next_page_number }}&order={{ order }}&search={{ search }}"
-                    class="btn btn-secondary">{{ articles.next_page_number }}</a>
-                    <span>...</span>
-                    <a href="?page={{ articles.paginator.num_pages }}&order={{ order }}&search={{ search }}"
-                    class="btn btn-success">{{ articles.paginator.num_pages }} &raquo;</a>
-                {% endif %}
-            </span>
+            <!-- 右侧预留区域：空白块与左栏同宽，高为个人信息卡片的1.5倍 -->
+            <aside class="sidebar-right d-none d-lg-block">
+                <div class="card-panel sidebar-placeholder" aria-hidden="true"></div>
+            </aside>
         </div>
     </div>
 </div>
+
+<script>
+    function updateLiveTime() {
+        const birthTime = new Date(2004, 8, 18, 15, 30, 0); // 月份从0开始，8表示9月
+        const now = new Date();
+        
+        let years = now.getFullYear() - birthTime.getFullYear();
+        let months = now.getMonth() - birthTime.getMonth();
+        let days = now.getDate() - birthTime.getDate();
+        let hours = now.getHours() - birthTime.getHours();
+        let minutes = now.getMinutes() - birthTime.getMinutes();
+        let seconds = now.getSeconds() - birthTime.getSeconds();
+        
+        // 处理负数情况
+        if (seconds < 0) {
+            seconds += 60;
+            minutes--;
+        }
+        if (minutes < 0) {
+            minutes += 60;
+            hours--;
+        }
+        if (hours < 0) {
+            hours += 24;
+            days--;
+        }
+        if (days < 0) {
+            const lastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+            days += lastMonth.getDate();
+            months--;
+        }
+        if (months < 0) {
+            months += 12;
+            years--;
+        }
+        
+        const timeStr = `已经活了：${years}年${months}月${days}天${hours}小时${minutes}分${seconds}秒`;
+        document.getElementById('live-time').textContent = timeStr;
+    }
+    
+    updateLiveTime();
+    setInterval(updateLiveTime, 1000);
+</script>
 {% endblock content %}
