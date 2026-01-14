@@ -6,6 +6,19 @@ from django.utils import timezone
 
 from django.urls import reverse
 
+
+# 27 栏目的模型
+class ArticleColumn(models.Model):
+    """
+    栏目的模型
+    """
+    title = models.CharField(max_length=100,blank=True)
+
+    created = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.title
+
 class ArticlePost(models.Model):
     ## 04 定义文章表的结构
     # 04 文章作者，外键，on_delete参数使文章作者注销时一并删除此文章
@@ -25,6 +38,18 @@ class ArticlePost(models.Model):
 
     # 20 浏览量
     total_views = models.PositiveIntegerField(default=0)
+
+    # 27 文章栏目
+    column = models.ForeignKey(
+        ArticleColumn,
+        # 27 允许为空
+        null=True,
+        # 27 表单允许空字符串
+        blank=True,
+        on_delete=models.CASCADE,
+        # 27 关联到column实例
+        related_name='article'
+    )
 
     ## 04 规范表行为
     # 04 内部类class meta用来给model定义元数据

@@ -16,7 +16,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
 # 06 导入数据模型
-from .models import ArticlePost
+from .models import ArticlePost,ArticleColumn
 
 # 19 分页模块
 from django.core.paginator import Paginator
@@ -106,6 +106,9 @@ def article_create(request):
         if article_post_form.is_valid():
             # 10 生成不写入数据库的ArticlePost实例
             new_article = article_post_form.save(commit=False)
+            # 27 如果有栏目信息
+            if request.POST['column']!='none':
+                new_article.column = ArticleColumn.objects.get(id=request.POST['column'])
             # 10 修改作者为1
             # 17 指定作者id
             new_article.author = User.objects.get(id=request.user.id)
@@ -120,8 +123,9 @@ def article_create(request):
     else:
         # 10 实例化表单类
         article_post_form = ArticlePostForm()
+        columns = ArticleColumn.objects.all()
         # 10 上下文，模板会用前面的名字找后面的对象
-        context = {'article_post_form':article_post_form}
+        context = {'article_post_form':article_post_form,'columns':columns}
         return render(request,'article/create.html',context)
     
 # 11 删除文章视图函数(不安全)
@@ -172,6 +176,10 @@ def article_update(request,id):
                 # 12 更新数据并保存
                 article.title = request.POST['title']
                 article.body = request.POST['body']
+                if request.POST['column']!='none':
+                    article.column = ArticleColumn.objects.get(id=request.POST['column'])
+                else:
+                    article.column = None
                 article.save()
                 # 12 重定向至对应id的文章详情页
                 return redirect("article:article_detail",id=id)
@@ -181,7 +189,8 @@ def article_update(request,id):
         # 12 如果是get请求
         else:
             article_post_form = ArticlePostForm()
-            context = {'article':article,'article_post_form':article_post_form}
+            columns= ArticleColumn.objects.all()
+            context = {'article':article,'article_post_form':article_post_form,'columns':columns}
             return render(request,'article/update.html',context)
     else:
             return HttpResponse("编辑操作仅允许作者本人和管理员使用")

@@ -20,6 +20,19 @@
                     <!-- 10 文本框 name是表单的类字典对象的键，与表单类字段对应 -->
                     <input type="text" class="form-control" id="title" name="title">
                 </div>
+                <!-- 文章栏目 -->
+                <div class="form-group">
+                    <label for="column">栏目</label>
+                    <select class="form-control" 
+                            id="column" 
+                            name="column"
+                    >
+                            <option value="none">请选择栏目..</option>
+                        {% for column in columns %}
+                            <option value="{{ column.id }}">{{ column }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
                 <!-- 文章正文 -->
                 <div class="form-group">
                     <label for="body">文章正文</label>

@@ -73,41 +73,59 @@
             <hr>
         {% endif %}
     {% endif %}
+    <!-- 列表循环 -->
     <div class="row mt-2">
-
         {% for article in articles %}
-        <!-- 06 循环开始-->
-        <!-- 文章内容 -->
-        <div class="col-12 col-md-4 mb-4">
-        <!-- 卡片容器 -->
-            <div class="card h-100">
+            <!-- 文章内容 -->
+            <div class="col-12">
+                <!-- 栏目 -->
+                {% if article.column %}
+                    <button type="button" 
+                        class="btn btn-sm mb-2
+                            {% if article.column.title == 'Django' %}
+                                btn-success
+                            {% elif article.column.title == 'Java' %}
+                                btn-danger
+                            {% elif article.column.title == 'HTML' %}
+                                btn-warning
+                            {% endif %}
+                        "
+                    >
+                        {{ article.column }}
+                    </button>
+                {% endif %}
                 <!-- 标题 -->
-                <h4 class="card-header d-flex justify-content-between align-items-end">
-                    <span style="word-break: break-all">{{ article.title }}</span>
-                    <small style="color: gray; font-size: 14px; margin-left: 20px; flex-shrink: 0;">
-                        浏览:{{ article.total_views }}
-                    </small>
+                <h4>
+                    <b>
+                        <a href="{% url 'article:article_detail' article.id %}"
+                        style="color: black;" 
+                        >
+                            {{ article.title }}
+                        </a>
+                    </b>
                 </h4>
-                <!-- 06 模板变量 (Variables) - {{ ... }}-->
-                <!-- 06 用来输出变量的值到页面上-->
                 <!-- 摘要 -->
-                <div class="card-body">
-                    <!-- 07 把article.body通过管道符'|'传给slice过滤器，截取前100个字符 -->
-                    <p class="card-text">{{ article.body|slice:'100' }}...</p>
+                <div>
+                    <p style="color: gray;">
+                        {{ article.body|slice:'100' }}...
+                    </p>
                 </div>
                 <!-- 注脚 -->
-                <div class="card-footer">
-                    <!-- 08 在命名空间article中找到别名为article_detail的路由并传入article.id作为参数 -->
-                    <a href="{% url 'article:article_detail' article.id %}" class="btn btn-primary">阅读本文</a>
-                </div>
+                <p>
+                    <!-- 附加信息 -->
+                    <span style="color: green;">
+                        {{ article.total_views }} 浏览&nbsp;&nbsp;&nbsp;
+                    </span>
+                    <span style="color: blue;">
+                        {{ article.created|date:'Y-m-d' }} 发布&nbsp;&nbsp;&nbsp;
+                    </span>
+                    <span style="color: darkred;">
+                        {{ article.updated|date:'Y-m-d' }} 更新
+                    </span>
+                </p>
+                <hr>
             </div>
-        </div>
         {% endfor %}
-        <!-- 06 循环结束-->
-        <!-- 06 模板标签 (Tags) - { % ... % }-->
-        <!-- 06 用来执行逻辑控制，比如循环和判断等-->
-        <!-- 06 同时必须显式结束-->
-
     </div>
     <!-- 页码导航 -->
     <div class="pagination row">
