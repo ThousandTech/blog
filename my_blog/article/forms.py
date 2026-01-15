@@ -11,4 +11,5 @@ class ArticlePostForm(forms.ModelForm):
         model = ArticlePost
         # 10 定义表单包含的字段
         # 10 就是给表单类指定一个模型，指定表单中可被修改的字段，被指定的字段会校验类型
-        fields = ('title','body')
+        # 28 未指定的字段需要自己手动在视图中进行处理，如column
+        fields = ('title','body','tags')

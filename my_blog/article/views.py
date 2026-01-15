@@ -36,6 +36,8 @@ def article_list(request):
     search = request.GET.get('search')
     # 27 专栏参数
     column_id = request.GET.get('column')
+    # 28 标签参数
+    tag = request.GET.get('tag')
     # if search:
     #     if column_id:
     #         if order == 'total_views':
@@ -79,6 +81,11 @@ def article_list(request):
     elif column_id and column_id != 'None':
         article_list = article_list.filter(column=ArticleColumn.objects.get(id=column_id))
 
+
+    if tag and tag != 'None':
+        # 28 如果有文章标签的名称在给定的列表中
+        article_list = article_list.filter(tags__name__in=[tag])
+
     # 3. 排序
     if order == 'total_views':
         article_list = article_list.order_by('-total_views')
@@ -95,6 +102,8 @@ def article_list(request):
     articles = paginator.get_page(page)
     columns = ArticleColumn.objects.all()
     uncategorized_count = ArticlePost.objects.filter(column__isnull=True).count()
+    # 28 获取所有标签
+    all_tags = ArticlePost.tags.all()
     # 获取Thousand用户信息用于个人卡片展示
     try:
         profile_user = User.objects.get(id=6)
@@ -102,7 +111,15 @@ def article_list(request):
         profile_user = None
     # 06 context字典定义了要传递给模板的上下文
     # 21 order用来传递给模板，在切换页时保持不同的排序
-    context = {'articles':articles,'order':order,'search':search,'columns':columns,'column':column_id,'uncategorized_count':uncategorized_count,'profile_user':profile_user}
+    context = {'articles':articles,
+               'order':order,
+               'search':search,
+               'columns':columns,
+               'column':column_id,
+               'uncategorized_count':uncategorized_count,
+               'profile_user':profile_user,
+               'tag':tag,
+               'all_tags':all_tags}
     # 06 render函数结合模板与上下文并返回渲染后的HttpResponse对象
     # 06 render的三个参数分别为固定的request，模板文件，传入模板文件的上下文（字典）
     return render(request,'article/list.html',context)
@@ -151,6 +168,10 @@ def article_create(request):
             new_article.author = User.objects.get(id=request.user.id)
             # 10 保存文件到数据库
             new_article.save()
+            # 27 保存tags的多对多关系，new_article主键在save()后才生成，
+            # 无法同时构建多对多关系，因此需要额外保存一次
+            # 27 表单实例处理多对多关系
+            article_post_form.save_m2m()
             # 10 重定向到文章列表
             return redirect("article:article_list")
         # 10 如果表单数据不合法，返回错误信息
@@ -206,18 +227,20 @@ def article_update(request,id):
     if article.author == request.user or request.user.is_superuser:
         # 12 如果是POST请求
         if request.method == "POST":
-            # 12 存储收到的表单数据
-            article_post_form = ArticlePostForm(data=request.POST)
+            # 12 存储收到的表单数据，绑定到现有的 article 实例
+            article_post_form = ArticlePostForm(data=request.POST, instance=article)
             # 12 如果数据均合法
             if article_post_form.is_valid():
-                # 12 更新数据并保存
-                article.title = request.POST['title']
-                article.body = request.POST['body']
+                # 12 更新数据但不立即保存到数据库
+                article = article_post_form.save(commit=False)
+                # 28 处理栏目
                 if request.POST['column']!='none':
                     article.column = ArticleColumn.objects.get(id=request.POST['column'])
                 else:
                     article.column = None
                 article.save()
+                # 28 保存多对多关系（tags），必须在 save() 之后调用
+                article_post_form.save_m2m()
                 # 12 重定向至对应id的文章详情页
                 return redirect("article:article_detail",id=id)
             # 12 如果数据不合法
@@ -227,7 +250,11 @@ def article_update(request,id):
         else:
             article_post_form = ArticlePostForm()
             columns= ArticleColumn.objects.all()
-            context = {'article':article,'article_post_form':article_post_form,'columns':columns}
+            
+            # 28 将 tags 的 queryset 对象转换为字符串，传递到模板
+            tags = ','.join([x for x in article.tags.names()])
+
+            context = {'article':article,'article_post_form':article_post_form,'columns':columns,'tags':tags}
             return render(request,'article/update.html',context)
     else:
             return HttpResponse("编辑操作仅允许作者本人和管理员使用")

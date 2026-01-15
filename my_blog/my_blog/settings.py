@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'userprofile',# 13 注册userprofile应用
     'password_reset',# 16 重置密码应用
     'comment',# 24 评论应用
+    'taggit',# 28 标签应用
 ]
 
 MIDDLEWARE = [

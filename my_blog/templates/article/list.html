@@ -233,6 +233,24 @@
         margin-left: 12px;
     }
 
+    .badge-secondary {
+        background-color: #2d3847;
+        color: var(--text);
+        border: 1px solid #3d4a5d;
+        transition: all 0.2s ease;
+    }
+
+    .badge-secondary:hover {
+        background-color: var(--accent);
+        color: #0c0f14;
+        text-decoration: none;
+        border-color: var(--accent);
+    }
+
+    .gap-2 {
+        gap: 8px;
+    }
+
     .pagination .btn {
         border-radius: 10px;
     }
@@ -304,24 +322,39 @@
                     </div>
                 </div>
 
-                <div class="card-panel category-card">
+                <div class="card-panel category-card mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="mb-0">分类</h6>
                     </div>
                     <ul class="list-unstyled mb-0">
                         <li class="d-flex justify-content-between align-items-center mb-2">
-                            <a href="?column=uncategorized&search={{ search }}&order={{ order }}" class="category-link">未分类</a>
+                            <a href="?column=uncategorized&order={{ order }}" class="category-link">未分类</a>
                             <span class="pill">{{ uncategorized_count }}</span>
                         </li>
                         {% for col in columns %}
                             <li class="d-flex justify-content-between align-items-center mb-2">
-                                <a href="?column={{ col.id }}&search={{ search }}&order={{ order }}" class="category-link">{{ col.title }}</a>
+                                <a href="?column={{ col.id }}&order={{ order }}" class="category-link">{{ col.title }}</a>
                                 <span class="pill">{{ col.article.count }}</span>
                             </li>
                         {% empty %}
                             <li class="text-muted small">暂无分类</li>
                         {% endfor %}
                     </ul>
+                </div>
+
+                <div class="card-panel category-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">热门标签</h6>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for tag in all_tags %}
+                            <a href="?tag={{ tag.name|urlencode }}" class="badge badge-secondary" style="font-size: 12px; padding: 6px 12px;">
+                                {{ tag }}
+                            </a>
+                        {% empty %}
+                            <p class="text-muted small">暂无标签</p>
+                        {% endfor %}
+                    </div>
                 </div>
             </aside>
 
@@ -331,13 +364,13 @@
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb align-items-center flex-nowrap mb-0">
                             <li class="breadcrumb-item" style="font-size: 1.1rem;">
-                                <a href="{% url 'article:article_list' %}?search={{ search }}&column={{ column }}"
+                                <a href="{% url 'article:article_list' %}?search={{ search }}&column={{ column }}&tag={{ tag }}"
                                    class="feed-tab {% if order == 'normal' %}active{% endif %}">
                                     最新
                                 </a>
                             </li>
                             <li class="breadcrumb-item" style="font-size: 1.1rem;">
-                                <a href="{% url 'article:article_list' %}?order=total_views&search={{ search }}&column={{ column }}"
+                                <a href="{% url 'article:article_list' %}?order=total_views&search={{ search }}&column={{ column }}&tag={{ tag }}"
                                    class="feed-tab {% if order == 'total_views' %}active{% endif %}">
                                     最热
                                 </a>
@@ -378,13 +411,20 @@
                             <div>
                                 {% if article.column %}
                                     {% widthratio article.column.id 1 60 as hue %}
-                                    <a href="{% url 'article:article_list' %}?column={{ article.column.id }}&search={{ search }}" 
+                                    <a href="{% url 'article:article_list' %}?column={{ article.column.id }}" 
                                         class="btn btn-sm column-tag"
                                         style="--hue: {{ hue }};"
                                     >
                                         {{ article.column }}
                                     </a>
                                 {% endif %}
+                                {% for tag in article.tags.all %}
+                                    <a href="{% url 'article:article_list' %}?tag={{ tag.name|urlencode }}" 
+                                    class="badge badge-secondary"
+                                    >
+                                        {{ tag }}
+                                    </a>
+                                {% endfor %}
                             </div>
                             <span class="article-meta">{{ article.updated|date:'Y-m-d' }} 更新</span>
                         </div>
@@ -410,9 +450,9 @@
                     <div class="m-auto">
                         <span class="step-links">
                             {% if articles.has_previous %}
-                                <a href="?page=1&order={{ order }}&search={{ search }}&column={{ column }}" class="btn btn-success">&laquo; 1</a>
+                                <a href="?page=1&order={{ order }}&search={{ search }}&column={{ column }}&tag={{ tag }}" class="btn btn-success">&laquo; 1</a>
                                 <span class="text-muted">...</span>
-                                <a href="?page={{ articles.previous_page_number }}&order={{ order }}&search={{ search }}&column={{ column }}" 
+                                <a href="?page={{ articles.previous_page_number }}&order={{ order }}&search={{ search }}&column={{ column }}&tag={{ tag }}" 
                                 class="btn btn-secondary"
                                 >
                                     {{ articles.previous_page_number }}
@@ -424,10 +464,10 @@
                             </span>
 
                             {% if articles.has_next %}
-                                <a href="?page={{ articles.next_page_number }}&order={{ order }}&search={{ search }}&column={{ column }}"
+                                <a href="?page={{ articles.next_page_number }}&order={{ order }}&search={{ search }}&column={{ column }}&tag={{ tag }}"
                                 class="btn btn-secondary">{{ articles.next_page_number }}</a>
                                 <span class="text-muted">...</span>
-                                <a href="?page={{ articles.paginator.num_pages }}&order={{ order }}&search={{ search }}&column={{ column }}"
+                                <a href="?page={{ articles.paginator.num_pages }}&order={{ order }}&search={{ search }}&column={{ column }}&tag={{ tag }}"
                                 class="btn btn-success">{{ articles.paginator.num_pages }} &raquo;</a>
                             {% endif %}
                         </span>

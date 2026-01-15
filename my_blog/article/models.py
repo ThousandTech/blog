@@ -6,6 +6,8 @@ from django.utils import timezone
 
 from django.urls import reverse
 
+from taggit.managers import TaggableManager
+
 
 # 27 栏目的模型
 class ArticleColumn(models.Model):
@@ -51,6 +53,9 @@ class ArticlePost(models.Model):
         related_name='article'
     )
 
+    # 28 标签字段
+    tags = TaggableManager(blank=True)
+    
     ## 04 规范表行为
     # 04 内部类class meta用来给model定义元数据
     # 04 元数据是**“任何不是字段的东西”**，例如排序选项ordering、数据库表名db_table、单数和复数名称verbose_name和 verbose_name_plural。这些信息不是某篇文章私有的数据，而是整张表的共同行为。
