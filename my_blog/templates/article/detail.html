@@ -160,6 +160,43 @@
     .comment-time {
         color: var(--success);
     }
+
+    .tag-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .column-tag {
+        color: hsl(var(--hue, 210), 60%, 20%);
+        background-color: hsl(var(--hue, 210), 70%, 88%);
+        border-color: hsl(var(--hue, 210), 70%, 76%);
+        font-weight: 600;
+    }
+
+    .column-tag:hover {
+        color: hsl(var(--hue, 210), 60%, 16%);
+        background-color: hsl(var(--hue, 210), 70%, 84%);
+        border-color: hsl(var(--hue, 210), 70%, 70%);
+        text-decoration: none;
+    }
+
+    .badge-secondary {
+        background-color: #2d3847;
+        color: var(--text);
+        border: 1px solid #3d4a5d;
+        transition: all 0.2s ease;
+        padding: 6px 12px;
+        border-radius: 8px;
+    }
+
+    .badge-secondary:hover {
+        background-color: var(--accent);
+        color: #0c0f14;
+        text-decoration: none;
+        border-color: var(--accent);
+    }
 </style>
 
 <!-- 文章详情 -->
@@ -168,6 +205,32 @@
         <!-- 标题及作者 -->
         <div class="col-12 col-md-10 {% if 'li' in toc %}offset-md-2{% else %}offset-md-1{% endif %}">
             <h1 class="mt-4 mb-4">{{ article.title }}</h1>
+            {% if article.column or article.tags.all %}
+            <div class="tag-row mb-3">
+                {% if article.column %}
+                    <span class="text-muted">分类：</span>
+                    {% widthratio article.column.id 1 60 as hue %}
+                    <a href="{% url 'article:article_list' %}?column={{ article.column.id }}" 
+                        class="btn btn-sm column-tag"
+                        style="--hue: {{ hue }};"
+                    >
+                        {{ article.column }}
+                    </a>
+                {% endif %}
+
+                {% if article.tags.all %}
+                    <span class="text-muted ml-2">标签：</span>
+                {% endif %}
+                {% for tag in article.tags.all %}
+                    <a href="{% url 'article:article_list' %}?tag={{ tag.name|urlencode }}" 
+                        class="badge badge-secondary"
+                    >
+                        {{ tag }}
+                    </a>
+                {% empty %}
+                {% endfor %}
+            </div>
+            {% endif %}
             <div class="alert alert-success">
                 <div>
                     作者：{{ article.author }}
