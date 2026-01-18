@@ -11,22 +11,25 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import environ
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+env = environ.Env(DEBUG=(bool, False))
+environ.Env.read_env(os.path.join(BASE_DIR,'.env'))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-with open(os.path.join(os.path.dirname(BASE_DIR), 'secret_key.txt')) as f:
-    SECRET_KEY = f.read().strip()
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
 
 # Application definition
@@ -134,7 +137,7 @@ EMAIL_HOST = 'smtp.126.com'
 # 改为你自己的邮箱名！
 EMAIL_HOST_USER = 'thousandtech@126.com'
 # 你的邮箱密码
-EMAIL_HOST_PASSWORD = '*********'
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 # 发送邮件的端口
 EMAIL_PORT = 25
 # 是否使用 TLS
@@ -146,3 +149,5 @@ PASSWORD_RESET_TOKEN_EXPIRES = 60 * 10
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media/')
+
+ALLOWED_IMEI = env.list('ALLOWED_IMEI')

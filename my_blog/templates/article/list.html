@@ -321,7 +321,6 @@
                     </div>
                     <h5 class="mt-3 mb-1">{{ profile_user.username|default:"Thousand" }}</h5>
                     <p class="text-muted mb-3">{{ profile_user.profile.bio|default:"Glad to meet you here, this is Thousand." }}</p>
-                    <p class="text-muted small mb-3" id="live-time" style="font-size: 0.85rem;"></p>
                     <div class="social-links d-flex justify-content-center gap-3">
                         <a href="https://github.com/ThousandTech" target="_blank" class="social-icon" title="GitHub">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -503,7 +502,30 @@
 
             <!-- 右侧预留区域：空白块与左栏同宽，高为个人信息卡片的1.5倍 -->
             <aside class="sidebar-right d-none d-lg-block">
-                <div class="card-panel sidebar-placeholder" aria-hidden="true"></div>
+                <div class="card-panel mb-3" id="admin-status-panel">
+                    <h5 class="mb-3">管理员</h5>
+                    <div id="admin-status-content">
+                        <div class="d-flex justify-content-between mb-0">
+                            <span>状态(根据终端使用情况推测)</span>
+                        </div>
+                        <div class="mt-1 mb-2">
+                            <span class="small" id="admin-state-text" style="font-size: 0.85rem;">检测中...</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-0">
+                            <span>运行时长</span>
+                        </div>
+                        <div class="mt-1">
+                            <span class="text-muted small" id="live-time" style="font-size: 0.85rem; color: #9aa3b0 !important;"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-panel" id="terminal-status-panel">
+                    <h5 class="mb-3">通讯终端</h5>
+                    <div id="terminal-status-content">
+                        <p class="text-muted small">正在获取数据...</p>
+                    </div>
+                </div>
             </aside>
         </div>
     </div>
@@ -544,11 +566,148 @@
             years--;
         }
         
-        const timeStr = `已经活了：${years}年${months}月${days}天${hours}小时${minutes}分${seconds}秒`;
+        const timeStr = `${years}年${months}月${days}天${hours}小时${minutes}分${seconds}秒`;
         document.getElementById('live-time').textContent = timeStr;
     }
     
     updateLiveTime();
     setInterval(updateLiveTime, 1000);
+
+    // Terminal Status Polling
+    let terminalUpTime = null;
+
+    function formatUptime(seconds) {
+        if (seconds === null || seconds === undefined) return '-';
+        const days = Math.floor(seconds / (3600 * 24));
+        const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+        
+        let result = '';
+        if (days > 0) result += `${days}天`;
+        if (hours > 0) result += `${hours}小时`;
+        result += `${minutes}分`;
+        result += `${secs}秒`;
+        return result;
+    }
+
+    function tickTerminalTime() {
+        if (terminalUpTime !== null) {
+            terminalUpTime++;
+            const el = document.getElementById('terminal-uptime');
+            if (el) {
+                el.textContent = formatUptime(terminalUpTime);
+            }
+        }
+    }
+    setInterval(tickTerminalTime, 1000);
+
+    function updateTerminalStatus() {
+        fetch('/article/terminal-latest/')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const contentDiv = document.getElementById('terminal-status-content');
+                if (data.error) {
+                    contentDiv.innerHTML = '<p class="text-muted small">暂无数据</p>';
+                    return;
+                }
+                
+                terminalUpTime = data.up_time;
+
+                let statusText = data.is_charging ? '充电中' : '在线';
+                let statusColor = data.is_charging ? 'var(--success)' : 'var(--accent)';
+                let timeDisplay = data.created;
+
+                if (data.is_offline) {
+                    statusText = '离线';
+                    statusColor = 'var(--muted)';
+                }
+                
+                // 推测管理员状态
+                let adminState = '空闲或摆烂';
+                let adminColor = 'var(--success)';
+                
+                // busy_time 是未使用手机休闲应用的累计时间
+                // 未使用时间较长认为是忙碌
+                if (data.busy_time > 900) {
+                    adminState = '忙碌或昏迷';
+                    adminColor = 'var(--accent)';
+                }
+
+                if (data.is_offline) {
+                    adminState = '失联';
+                    adminColor = 'var(--muted)';
+                }
+
+                document.getElementById('admin-state-text').textContent = adminState;
+                document.getElementById('admin-state-text').style.color = adminColor;
+
+                // 计算颜色渐变
+                function getBatteryColor(percent) {
+                    // 定义起始颜色 (绿色 #9fe870) 和结束颜色 (红色 #e63946)
+                    // 使用 HSL 色彩空间进行计算可能更自然，这里简单使用 RGB 插值
+                    // #9fe870 = rgb(159, 232, 112)
+                    // #ff6b6b (柔和红) = rgb(255, 107, 107)
+                    
+                    const startR = 255, startG = 107, startB = 107; // 红色 (低电量)
+                    const endR = 159, endG = 232, endB = 112;     // 绿色 (高电量)
+                    
+                    const ratio = percent / 100;
+                    
+                    const r = Math.round(startR + (endR - startR) * ratio);
+                    const g = Math.round(startG + (endG - startG) * ratio);
+                    const b = Math.round(startB + (endB - startB) * ratio);
+                    
+                    return `rgb(${r}, ${g}, ${b})`;
+                }
+                
+                const batteryColor = getBatteryColor(data.percent);
+
+                contentDiv.innerHTML = `
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>电量</span>
+                        <span style="color: ${batteryColor}; font-weight: bold;">${data.percent}%</span>
+                    </div>
+                    <div class="progress mb-3" style="height: 6px; background-color: rgba(127, 127, 127, 0.3);">
+                        <div class="progress-bar" role="progressbar" 
+                             style="width: ${data.percent}%; background-color: ${batteryColor};" 
+                             aria-valuenow="${data.percent}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-0">
+                        <span>状态</span>
+                    </div>
+                    <div class="mt-1 mb-2">
+                        <span class="text-muted small" style="font-size: 0.85rem; color: ${statusColor} !important;">${statusText}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-0">
+                        <span>运行时长</span>
+                    </div>
+                    <div class="mt-1 mb-2">
+                        <span id="terminal-uptime" class="text-muted small" style="font-size: 0.85rem; color: #9aa3b0 !important;">${formatUptime(data.up_time)}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-0">
+                        <span>${data.is_offline ? '最后上报时间' : '更新时间'}</span>
+                    </div>
+                    <div class="mt-1">
+                        <span class="text-muted small" style="font-size: 0.85rem; color: #9aa3b0 !important;">${timeDisplay}</span>
+                    </div>
+                `;
+            })
+            .catch(error => {
+                console.error('Error fetching terminal status:', error);
+            });
+    }
+
+    // Update immediately and then every 3 seconds
+    updateTerminalStatus();
+    setInterval(updateTerminalStatus, 3000);
 </script>
 {% endblock content %}

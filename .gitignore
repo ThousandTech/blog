@@ -11,5 +11,5 @@ db.sqlite3
 
 # media files
 media/
-
-secret_key.txt
+# ENV and secret keys
+.env
