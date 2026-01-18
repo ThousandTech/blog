@@ -99,7 +99,7 @@ def article_list(request):
 
 
     # 19 每页3篇文章
-    paginator = Paginator(article_list,6)
+    paginator = Paginator(article_list,8)
     # 19 从url中'?page=value'中获取page的值，没有这个会直接返回None
     page = request.GET.get('page')
     # 19 将页码对应的文章返回给articles，page为None返回1

@@ -10,6 +10,7 @@
 
 <!-- 07 写入 base.html 中定义的 content -->
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/echarts@4/dist/echarts.min.js"></script>
 <style>
     :root {
         --bg: #0f1216;
@@ -304,6 +305,48 @@
             max-width: 160px;
         }
     }
+
+    /* Monitor Styles */
+    .metric-bar {
+        height: 18px;
+        background-color: var(--surface-soft);
+        border-radius: 3px;
+        overflow: hidden;
+        position: relative;
+    }
+    .metric-bar-fill {
+        height: 100%;
+        width: 0%;
+        display: block; /* changed from flex */
+        background-color: transparent; /* color set by JS */
+        transition: width 0.4s ease, background-color 0.4s ease;
+    }
+    .metric-text-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between; /* changed from flex-start to space-between */
+        padding-left: 6px;
+        padding-right: 6px; /* added right padding */
+        font-size: 10px;
+        color: #ffffff;
+        text-shadow: 0 0 2px rgba(0,0,0,0.8), 0 0 4px rgba(0,0,0,0.6); /* Text shadow for contrast */
+        pointer-events: none; /* Let clicks pass through */
+        z-index: 10;
+    }
+    .net-indicator {
+        font-size: 0.85em;
+    }
+    .net-up {
+        color: #c0504d;
+    }
+    .net-down {
+        color: #4f81bd;
+    }
 </style>
 
 <div class="layout-shell">
@@ -502,6 +545,24 @@
 
             <!-- 右侧预留区域：空白块与左栏同宽，高为个人信息卡片的1.5倍 -->
             <aside class="sidebar-right d-none d-lg-block">
+                <div class="card-panel mb-3" id="earth-time-panel">
+                    <h5 class="mb-3">地球</h5>
+                    <div class="monitor-info">
+                        <div class="d-flex justify-content-between mb-0">
+                            <span>标准时间</span>
+                        </div>
+                        <div class="mt-1 mb-2">
+                            <span id="utc-time" class="text-muted small" style="font-size: 0.85rem; color: #9aa3b0 !important;">...</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-0">
+                            <span>本地时间</span>
+                        </div>
+                        <div class="mt-1 mb-2">
+                            <span id="local-time" class="text-muted small" style="font-size: 0.85rem; color: #9aa3b0 !important;">...</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card-panel mb-3" id="admin-status-panel">
                     <h5 class="mb-3">管理员</h5>
                     <div id="admin-status-content">
@@ -520,16 +581,107 @@
                     </div>
                 </div>
 
-                <div class="card-panel" id="terminal-status-panel">
+                <div class="card-panel mb-3" id="terminal-status-panel">
                     <h5 class="mb-3">通讯终端</h5>
                     <div id="terminal-status-content">
                         <p class="text-muted small">正在获取数据...</p>
+                    </div>
+                </div>
+
+                <div class="card-panel mb-3">
+                    <h5 class="mb-3">服务器</h5>
+                    
+                    <div class="monitor-info mb-3">
+                        <div class="d-flex justify-content-between mb-0">
+                            <span>系统版本</span>
+                        </div>
+                        <div class="mt-1 mb-2">
+                            <span id="system-version" class="text-muted small" style="font-size: 0.85rem; color: #9aa3b0 !important;">...</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-0">
+                            <span>主机名</span>
+                        </div>
+                        <div class="mt-1 mb-2">
+                            <span id="hostname" class="text-muted small" style="font-size: 0.85rem; color: #9aa3b0 !important;">...</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-0">
+                            <span>CPU</span>
+                        </div>
+                        <div class="mt-1 mb-2">
+                            <span id="cpu-name" class="text-muted small" style="font-size: 0.85rem; color: #9aa3b0 !important;">...</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-0">
+                            <span>运行时长</span>
+                        </div>
+                        <div class="mt-1 mb-2">
+                            <span id="uptime" class="text-muted small" style="font-size: 0.85rem; color: #9aa3b0 !important;">...</span>
+                        </div>
+                    </div>
+
+                    <div class="monitor-metric mb-3">
+                        <div class="d-flex justify-content-between mb-0">
+                            <span>CPU使用率</span>
+                        </div>
+                        <div class="mt-1 mb-2">
+                            <div class="metric-bar">
+                                <div id="cpu-bar" class="metric-bar-fill"></div>
+                                <div class="metric-text-overlay">
+                                    <span id="cpu-percent-text">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="monitor-metric mb-3">
+                        <div class="d-flex justify-content-between mb-0">
+                            <span>内存使用率</span>
+                        </div>
+                        <div class="mt-1 mb-2">
+                            <div class="metric-bar">
+                                <div id="mem-bar" class="metric-bar-fill"></div>
+                                <div class="metric-text-overlay">
+                                    <span id="mem-percent-text">0%</span>
+                                    <span id="mem-usage-text">0G/0G</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="monitor-chart mb-3">
+                        <div class="d-flex justify-content-between mb-0">
+                            <span>磁盘 I/O</span>
+                        </div>
+                        <div class="mt-1 mb-2 position-relative">
+                            <div class="position-absolute" style="top: 0; right: 0; z-index: 10;">
+                                <span id="disk-r-indicator" class="net-indicator net-up mr-2 small" style="font-size: 0.85rem;"></span>
+                                <span id="disk-w-indicator" class="net-indicator net-down small" style="font-size: 0.85rem;"></span>
+                            </div>
+                            <div id="disk-chart" style="width: 100%; height: 120px;"></div>
+                        </div>
+                    </div>
+
+                    <div class="monitor-chart">
+                        <div class="d-flex justify-content-between mb-0">
+                            <span>网络流量</span>
+                        </div>
+                        <div class="mt-1 mb-2 position-relative">
+                            <div class="position-absolute" style="top: 0; right: 0; z-index: 10;">
+                                <span id="net-up-indicator" class="net-indicator net-up mr-2 small" style="font-size: 0.85rem;"></span>
+                                <span id="net-down-indicator" class="net-indicator net-down small" style="font-size: 0.85rem;"></span>
+                            </div>
+                            <div id="network-chart" style="width: 100%; height: 120px;"></div>
+                        </div>
                     </div>
                 </div>
             </aside>
         </div>
     </div>
 </div>
+
+{% include 'monitor/script.html' %}
 
 <script>
     function updateLiveTime() {
@@ -566,7 +718,7 @@
             years--;
         }
         
-        const timeStr = `${years}年${months}月${days}天${hours}小时${minutes}分${seconds}秒`;
+        const timeStr = `${years}y ${months}m ${days}d ${hours}h ${minutes}m ${seconds}s`;
         document.getElementById('live-time').textContent = timeStr;
     }
     
@@ -585,10 +737,10 @@
         const secs = Math.floor(seconds % 60);
         
         let result = '';
-        if (days > 0) result += `${days}天`;
-        if (hours > 0) result += `${hours}小时`;
-        result += `${minutes}分`;
-        result += `${secs}秒`;
+        if (days > 0) result += `${days}d `;
+        if (hours > 0) result += `${hours}h `;
+        result += `${minutes}m `;
+        result += `${secs}s`;
         return result;
     }
 
@@ -707,7 +859,7 @@
                         <span>${data.is_offline ? '最后上报时间' : '更新时间'}</span>
                     </div>
                     <div class="mt-1">
-                        <span class="text-muted small" style="font-size: 0.85rem; color: #9aa3b0 !important;">${timeDisplay}</span>
+                        <span class="text-muted small" style="font-size: 0.85rem; color: #9aa3b0 !important;">${timeDisplay} (UTC+8)</span>
                     </div>
                 `;
             })

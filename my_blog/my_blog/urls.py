@@ -27,6 +27,7 @@ urlpatterns = [
     # 03 include('article.urls', namespace='article')参数告诉Django去查找article应用下的urls.py文件
     # 03 namespace='article'参数为article应用指定了一个命名空间
     path('article/', include('article.urls', namespace='article')),
+    path('monitor/', include('monitor.urls', namespace='monitor')),
     # 13 用户管理根路由
     path('userprofile/',include('userprofile.urls',namespace='userprofile')),
     # 16 重置密码路由
