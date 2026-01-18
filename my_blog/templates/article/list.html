@@ -575,6 +575,7 @@
 
     // Terminal Status Polling
     let terminalUpTime = null;
+    let isTerminalOffline = false;
 
     function formatUptime(seconds) {
         if (seconds === null || seconds === undefined) return '-';
@@ -592,7 +593,7 @@
     }
 
     function tickTerminalTime() {
-        if (terminalUpTime !== null) {
+        if (terminalUpTime !== null && !isTerminalOffline) {
             terminalUpTime++;
             const el = document.getElementById('terminal-uptime');
             if (el) {
@@ -618,6 +619,7 @@
                 }
                 
                 terminalUpTime = data.up_time;
+                isTerminalOffline = data.is_offline;
 
                 let statusText = data.is_charging ? '充电中' : '在线';
                 let statusColor = data.is_charging ? 'var(--success)' : 'var(--accent)';
@@ -666,17 +668,25 @@
                     return `rgb(${r}, ${g}, ${b})`;
                 }
                 
-                const batteryColor = getBatteryColor(data.percent);
+                let batteryColor = getBatteryColor(data.percent);
+                let batteryText = `${data.percent}%`;
+                let batteryWidth = data.percent;
+                
+                if (data.is_offline) {
+                    batteryColor = 'var(--muted)';
+                    batteryText = 'NaN';
+                    batteryWidth = 0;
+                }
 
                 contentDiv.innerHTML = `
                     <div class="d-flex justify-content-between mb-2">
                         <span>电量</span>
-                        <span style="color: ${batteryColor}; font-weight: bold;">${data.percent}%</span>
+                        <span style="color: ${batteryColor}; font-weight: bold;">${batteryText}</span>
                     </div>
                     <div class="progress mb-3" style="height: 6px; background-color: rgba(127, 127, 127, 0.3);">
                         <div class="progress-bar" role="progressbar" 
-                             style="width: ${data.percent}%; background-color: ${batteryColor};" 
-                             aria-valuenow="${data.percent}" aria-valuemin="0" aria-valuemax="100"></div>
+                             style="width: ${batteryWidth}%; background-color: ${batteryColor};" 
+                             aria-valuenow="${batteryWidth}" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
 
                     <div class="d-flex justify-content-between mb-0">
@@ -708,6 +718,6 @@
 
     // Update immediately and then every 3 seconds
     updateTerminalStatus();
-    setInterval(updateTerminalStatus, 3000);
+    setInterval(updateTerminalStatus, 60000);
 </script>
 {% endblock content %}
