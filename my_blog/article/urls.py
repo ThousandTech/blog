@@ -18,8 +18,4 @@ urlpatterns = [
     path('article-safe-delete/<int:id>/',views.article_safe_delete,name='article_safe_delete'),
     # 12 更新文章路由
     path('article-update/<int:id>/',views.article_update,name='article_update'),
-    # sp 终端上报路由
-    path('terminal-receive/',views.terminal_status_receive,name='terminal-receive'),
-    # sp 获取最新终端状态
-    path('terminal-latest/',views.terminal_status_latest,name='terminal_latest'),
 ]

@@ -4,8 +4,6 @@ import json
 
 from django.shortcuts import render,redirect
 
-from django.conf import settings
-
 # 05 导入HttpResponse模块
 # 10 引入重定向模块
 from django.http import HttpResponse, JsonResponse
@@ -17,10 +15,9 @@ from .forms import ArticlePostForm
 from django.contrib.auth.models import User
 # 17 引入登录检查装饰器
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
 
 # 06 导入数据模型
-from .models import ArticlePost,ArticleColumn,TerminalMonitor
+from .models import ArticlePost,ArticleColumn
 
 # 19 分页模块
 from django.core.paginator import Paginator
@@ -262,46 +259,3 @@ def article_update(request,id):
             return render(request,'article/update.html',context)
     else:
             return HttpResponse("编辑操作仅允许作者本人和管理员使用")
-
-@csrf_exempt
-def terminal_status_receive(request):
-    if request.method == 'POST':
-        terminal_status = json.loads(request.body)
-        if terminal_status['imei'] in settings.ALLOWED_IMEI:
-            TerminalMonitor.objects.create(
-                imei = terminal_status['imei'],
-                percent = terminal_status['percent'],
-                is_charging = (str(terminal_status['charging'])=='1'),
-                busy_time = terminal_status['busy'],
-                up_time = terminal_status.get('uptime', 0)
-            )
-
-            return HttpResponse('ok')
-        else:
-            return HttpResponse('不接受此终端的上报,请联系管理员')
-    else:
-        return HttpResponse('终端状态上报仅允许POST请求')
-
-from django.utils import timezone
-
-def terminal_status_latest(request):
-    latest_status = TerminalMonitor.objects.order_by('-created').first()
-    if latest_status:
-        # 转换为本地时间
-        created_local = timezone.localtime(latest_status.created)
-        
-        # 计算是否超时（例如5分钟无上报视为离线）
-        time_diff = (timezone.now() - latest_status.created).total_seconds()
-        is_offline = time_diff > 300  # 300秒 = 5分钟
-        
-        data = {
-            'percent': latest_status.percent,
-            'is_charging': latest_status.is_charging,
-            'busy_time': latest_status.busy_time,
-            'up_time': latest_status.up_time,
-            'created': created_local.strftime('%Y-%m-%d %H:%M:%S'),
-            'is_offline': is_offline,
-        }
-        return JsonResponse(data)
-    else:
-        return JsonResponse({'error': 'No data'}, status=404)
