@@ -11,17 +11,21 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
 def _get_cpu_name():
-    # Try platform first, then /proc/cpuinfo on Linux, fallback
+    # On Linux, /proc/cpuinfo provides the model name
+    if platform.system() == "Linux":
+        try:
+            with open('/proc/cpuinfo', 'r', encoding='utf-8') as f:
+                for line in f:
+                    if 'model name' in line:
+                        return line.split(':', 1)[1].strip()
+        except Exception:
+            pass
+    
+    # Fallback for Windows or if /proc/cpuinfo fails
     name = platform.processor()
     if name:
         return name
-    try:
-        with open('/proc/cpuinfo', 'r', encoding='utf-8') as f:
-            for line in f:
-                if 'model name' in line:
-                    return line.split(':', 1)[1].strip()
-    except Exception:
-        pass
+        
     return 'Unknown CPU'
 
 
@@ -72,67 +76,101 @@ def system_info(request):
 
 
 def system_state_details(request):
-    cpu = psutil.cpu_times_percent()
-    mem = psutil.virtual_memory()
-    disk = psutil.disk_io_counters()
-    net = psutil.net_io_counters()
-    data = {
-        'cpu': {
-            'count': psutil.cpu_count(),
-            'user': cpu.user,
-            'system': cpu.system,
-        },
-        'mem': {
-            'total': mem.total,
-            'available': mem.available,
-            'percent': mem.percent,
-            'used': mem.used,
-        },
-        'disk': list(disk),
-        'net': list(net),
-        'time': time.time(),
-    }
-    return JsonResponse(data)
+    try:
+        cpu = psutil.cpu_times_percent()
+        mem = psutil.virtual_memory()
+        
+        # Disk IO counters can fail on some systems (e.g. old psutil vs new kernel)
+        try:
+            disk = psutil.disk_io_counters()
+            disk_list = list(disk) if disk else []
+        except Exception:
+            disk_list = []
+
+        # Net IO counters can also fail
+        try:
+            net = psutil.net_io_counters()
+            net_list = list(net) if net else []
+        except Exception:
+            net_list = []
+
+        data = {
+            'cpu': {
+                'count': psutil.cpu_count(),
+                'user': cpu.user,
+                'system': cpu.system,
+            },
+            'mem': {
+                'total': mem.total,
+                'available': mem.available,
+                'percent': mem.percent,
+                'used': mem.used,
+            },
+            'disk': disk_list,
+            'net': net_list,
+            'time': time.time(),
+        }
+        return JsonResponse(data)
+    except Exception as e:
+        # Return error details to help debugging
+        import traceback
+        return JsonResponse({'error': str(e), 'detail': traceback.format_exc()}, status=500)
 
 @csrf_exempt
 def terminal_status_receive(request):
-    if request.method == 'POST':
-        terminal_status = json.loads(request.body)
-        if terminal_status['imei'] in settings.ALLOWED_IMEIS:
-            TerminalMonitor.objects.create(
-                imei = terminal_status['imei'],
-                percent = terminal_status['percent'],
-                is_charging = (str(terminal_status['charging'])=='1'),
-                busy_time = terminal_status['busy'],
-                up_time = terminal_status.get('uptime', 0)
-            )
+    try:
+        if request.method == 'POST':
+            try:
+                terminal_status = json.loads(request.body)
+            except Exception as e:
+                return HttpResponse(f"JSON Parse Error: {e}", status=400)
 
-            return HttpResponse('ok')
+            # Get allowed IMEIs safely
+            allowed_imeis = getattr(settings, 'ALLOWED_IMEIS', [])
+            imei = terminal_status.get('imei')
+            
+            if imei and str(imei) in allowed_imeis:
+                TerminalMonitor.objects.create(
+                    imei = imei,
+                    percent = terminal_status.get('percent', 0),
+                    is_charging = (str(terminal_status.get('charging', 0))=='1'),
+                    busy_time = terminal_status.get('busy', 0),
+                    up_time = terminal_status.get('uptime', 0)
+                )
+
+                return HttpResponse('ok')
+            else:
+                return HttpResponse('不接受此终端的上报,请联系管理员', status=403)
         else:
-            return HttpResponse('不接受此终端的上报,请联系管理员', status=403)
-    else:
-        return HttpResponse('终端状态上报仅允许POST请求', status=405)
+            return HttpResponse('终端状态上报仅允许POST请求', status=405)
+    except Exception as e:
+        import traceback
+        return HttpResponse(f"Error: {str(e)}\n{traceback.format_exc()}", status=500)
 
 from django.utils import timezone
 
 def terminal_status_latest(request):
-    latest_status = TerminalMonitor.objects.order_by('-created').first()
-    if latest_status:
-        # 转换为本地时间
-        created_local = timezone.localtime(latest_status.created)
-        
-        # 计算是否超时（例如5分钟无上报视为离线）
-        time_diff = (timezone.now() - latest_status.created).total_seconds()
-        is_offline = time_diff > 300  # 300秒 = 5分钟
-        
-        data = {
-            'percent': latest_status.percent,
-            'is_charging': latest_status.is_charging,
-            'busy_time': latest_status.busy_time,
-            'up_time': latest_status.up_time,
-            'created': created_local.strftime('%Y-%m-%d %H:%M:%S'),
-            'is_offline': is_offline,
-        }
-        return JsonResponse(data)
-    else:
-        return JsonResponse({'error': 'No data'}, status=404)
+    try:
+        latest_status = TerminalMonitor.objects.order_by('-created').first()
+        if latest_status:
+            # 转换为本地时间
+            created_local = timezone.localtime(latest_status.created)
+            
+            # 计算是否超时（例如5分钟无上报视为离线）
+            time_diff = (timezone.now() - latest_status.created).total_seconds()
+            is_offline = time_diff > 300  # 300秒 = 5分钟
+            
+            data = {
+                'percent': latest_status.percent,
+                'is_charging': latest_status.is_charging,
+                'busy_time': latest_status.busy_time,
+                'up_time': latest_status.up_time,
+                'created': created_local.strftime('%Y-%m-%d %H:%M:%S'),
+                'is_offline': is_offline,
+            }
+            return JsonResponse(data)
+        else:
+            return JsonResponse({'error': 'No data'}, status=404)
+    except Exception as e:
+        import traceback
+        return JsonResponse({'error': str(e), 'detail': traceback.format_exc()}, status=500)
