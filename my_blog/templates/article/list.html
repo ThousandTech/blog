@@ -13,12 +13,25 @@
 
 <!-- 07 写入 base.html 中定义的 content -->
 {% block content %}
+<!-- 移动端 Tab 导航栏 -->
+<div class="mobile-tabs d-lg-none">
+    <div class="mobile-tab-item active" data-tab="articles">
+        <span>文章</span>
+    </div>
+    <div class="mobile-tab-item" data-tab="categories">
+        <span>分类/标签</span>
+    </div>
+    <div class="mobile-tab-item" data-tab="about">
+        <span>关于</span>
+    </div>
+</div>
+
 <div class="layout-shell list-page">
     <div class="container-fluid custom-container">
         <div class="content-grid">
             <!-- 左侧：个人信息 + 分类 -->
             <aside class="sidebar-left">
-                <div class="card-panel profile-card text-center mb-3">
+                <div class="card-panel profile-card text-center mb-3 mobile-content-about">
                     <div class="avatar-circle">
                         {% if profile_user.profile.avatar %}
                             <img src="{{ profile_user.profile.avatar.url }}" alt="{{ profile_user.username }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
@@ -47,7 +60,7 @@
                     </div>
                 </div>
 
-                <div class="card-panel category-card mb-3">
+                <div class="card-panel category-card mb-3 mobile-content-categories">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="mb-0">分类</h6>
                     </div>
@@ -73,13 +86,13 @@
                     </ul>
                 </div>
 
-                <div class="card-panel category-card">
+                <div class="card-panel category-card mobile-content-categories">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="mb-0">标签</h6>
                     </div>
                     <div class="d-flex flex-wrap gap-2">
                         {% for tag in all_tags %}
-                            <a href="?tag={{ tag.name|urlencode }}" class="badge badge-secondary" style="font-size: 12px; padding: 6px 12px;">
+                            <a href="?tag={{ tag.name|urlencode }}" class="badge badge-secondary">
                                 {{ tag }}
                             </a>
                         {% empty %}
@@ -139,7 +152,7 @@
                 {% for article in articles %}
                     <div class="card-panel article-card">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div>
+                            <div class="article-tags-wrapper">
                                 {% if article.column %}
                                     {% widthratio article.column.id 1 60 as hue %}
                                     <a href="{% url 'article:article_list' %}?column={{ article.column.id }}" 
@@ -157,7 +170,7 @@
                                     </a>
                                 {% endfor %}
                             </div>
-                            <span class="article-meta">{{ article.updated|date:'Y-m-d' }} 更新</span>
+                            <span class="article-meta text-nowrap ml-2">{{ article.updated|date:'Y-m-d' }} 更新</span>
                         </div>
 
                         <h4 class="article-title">
@@ -208,7 +221,7 @@
             </main>
 
             <!-- 右侧预留区域：空白块与左栏同宽，高为个人信息卡片的1.5倍 -->
-            <aside class="sidebar-right d-none d-lg-block">
+            <aside class="sidebar-right mobile-content-about">
                 <div class="card-panel mb-3" id="earth-time-panel">
                     <h5 class="mb-3">地球</h5>
                     <div class="monitor-info">
@@ -327,7 +340,7 @@
                         </div>
                     </div>
 
-                    <div class="monitor-chart">
+                    <div class="monitor-chart mb-3">
                         <div class="d-flex justify-content-between mb-0">
                             <span>网络流量</span>
                         </div>
@@ -344,11 +357,11 @@
         </div>
     </div>
 </div>
-<div id="monitor-config" class="d-none" data-monitor-info-url="{% url 'monitor:info' %}" data-monitor-state-url="{% url 'monitor:state' %}" data-monitor-terminal-url="{% url 'monitor:terminal_latest' %}"></div>
-
+    <div id="monitor-config" class="d-none" data-monitor-info-url="{% url 'monitor:info' %}" data-monitor-state-url="{% url 'monitor:state' %}" data-monitor-terminal-url="{% url 'monitor:terminal_latest' %}"></div>
 {% endblock content %}
+
 {% block extra_js %}
     <script src="https://cdn.jsdelivr.net/npm/echarts@4/dist/echarts.min.js"></script>
     <script src="{% static 'js/monitor.js' %}"></script>
-    <script src="{% static 'js/article/list.js' %}"></script>
+    <script src="{% static 'js/article/list.js' %}?v=20260119"></script>
 {% endblock extra_js %}

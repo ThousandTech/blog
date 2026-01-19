@@ -182,3 +182,84 @@ document.addEventListener('DOMContentLoaded', function () {
     updateTerminalStatus();
     setInterval(updateTerminalStatus, 60000);
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('.mobile-tab-item');
+    const mainFeed = document.querySelector('.main-feed');
+    const sidebarLeft = document.querySelector('.sidebar-left');
+    const sidebarRight = document.querySelector('.sidebar-right');
+    
+    // 内容区域
+    const aboutContent = document.querySelectorAll('.mobile-content-about');
+    const categoriesContent = document.querySelectorAll('.mobile-content-categories');
+    
+    // 仅在移动端生效的 Tab 切换逻辑
+    function switchTab(tabName) {
+        // 1. 更新 Tab 状态
+        tabs.forEach(t => {
+            if (t.dataset.tab === tabName) {
+                t.classList.add('active');
+            } else {
+                t.classList.remove('active');
+            }
+        });
+
+        // 2. 如果是桌面端，不做任何内容隐藏操作（依靠 CSS 媒体查询）
+        if (window.innerWidth >= 992) return;
+
+        // 3. 移动端内容显示逻辑
+        // 重置所有可见性
+        mainFeed.style.display = 'none';
+        sidebarLeft.style.display = 'none';
+        sidebarRight.style.display = 'none';
+        
+        // 隐藏 Sidebar Left 内部的所有子模块
+        aboutContent.forEach(el => el.style.display = 'none');
+        categoriesContent.forEach(el => el.style.display = 'none');
+        
+        // 根据 Tab 显示对应内容
+        if (tabName === 'articles') {
+            mainFeed.style.display = 'block';
+        } else if (tabName === 'categories') {
+            sidebarLeft.style.display = 'block';
+            categoriesContent.forEach(el => el.style.display = 'block');
+        } else if (tabName === 'about') {
+            sidebarLeft.style.display = 'block';
+            sidebarRight.style.display = 'block';
+            aboutContent.forEach(el => el.style.display = 'block');
+            // 切换到关于页面时，强制刷新图表大小
+            if (window.monitorDiskChart) window.monitorDiskChart.resize();
+            if (window.monitorNetChart) window.monitorNetChart.resize();
+        }
+    }
+
+    // 绑定点击事件
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            switchTab(tab.dataset.tab);
+        });
+    });
+
+    // 初始化：默认显示文章
+    if (window.innerWidth < 992) {
+        switchTab('articles');
+    }
+
+    // 监听窗口大小变化，恢复/重置显示
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 992) {
+            // 桌面端恢复所有元素的显示
+            mainFeed.style.display = '';
+            sidebarLeft.style.display = '';
+            sidebarRight.style.display = '';
+            aboutContent.forEach(el => el.style.display = '');
+            categoriesContent.forEach(el => el.style.display = '');
+        } else {
+            // 切回移动端时，重新应用当前激活的 Tab
+            const activeTab = document.querySelector('.mobile-tab-item.active');
+            if (activeTab) {
+                switchTab(activeTab.dataset.tab);
+            }
+        }
+    });
+});

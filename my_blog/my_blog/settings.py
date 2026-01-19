@@ -132,6 +132,7 @@ STATICFILES_DIRS = (
 )
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
 
 # SMTP服务器，改为你的邮箱的smtp!
 EMAIL_HOST = 'smtp.126.com'

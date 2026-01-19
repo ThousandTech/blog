@@ -20,9 +20,9 @@ def post_comment(request,article_id):
             # 24 重定向至对应文章的详情页，参数为model对象时会自动调用此对象的get_absolute_url函数
             return redirect(article)
         else:
-            return HttpResponse("表单内容有误，请重新填写")
+            return render(request, 'notice.html', {'message': "表单内容有误，请重新填写", 'title': "错误提示", 'icon': "fas fa-exclamation-triangle"})
     else:
-        return HttpResponse("此操作仅允许POST请求")
+        return render(request, 'notice.html', {'message': "此操作仅允许POST请求", 'title': "请求错误", 'icon': "fas fa-times-circle"})
     
 @login_required(login_url='/userprofile/login/')
 def delete_comment(request,comment_id):
@@ -33,7 +33,7 @@ def delete_comment(request,comment_id):
             comment.delete()
             return redirect(article)
         else:
-            return HttpResponse('<script>alert("此操作仅允许评论者，文章作者与管理员使用");window.history.back();</script>')
+            return render(request, 'notice.html', {'message': "此操作仅允许评论者，文章作者与管理员使用", 'title': "权限拒绝", 'icon': "fas fa-ban"})
     else:
-        return HttpResponse('<script>alert("此操作仅允许POST请求");window.history.back();</script>')
+        return render(request, 'notice.html', {'message': "此操作仅允许POST请求", 'title': "请求错误", 'icon': "fas fa-times-circle"})
 

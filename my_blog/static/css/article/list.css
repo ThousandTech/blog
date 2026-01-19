@@ -216,6 +216,7 @@
     transition: all 0.2s ease;
     padding: 6px 12px;
     border-radius: 8px;
+    font-size: 12px;
 }
 
 .badge-secondary:hover {
@@ -301,10 +302,78 @@
     .content-grid {
         grid-template-columns: 1fr;
     }
+
+    /* 默认隐藏右侧边栏，但在 JS 控制下会显示 */
+    .sidebar-right {
+        display: none;
+    }
+}
+
+/* 移动端 Tab 导航栏样式 */
+.mobile-tabs {
+    display: flex;
+    justify-content: space-around;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.mobile-tab-item {
+    padding: 12px 0;
+    flex: 1;
+    text-align: center;
+    color: var(--muted);
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.mobile-tab-item.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+.mobile-tab-item:active {
+    background-color: var(--surface-soft);
 }
 
 @media (max-width: 576px) {
     .feed-search input {
-        max-width: 160px;
+        max-width: 120px;
+    }
+    
+    .feed-nav {
+        flex-wrap: nowrap;
+        gap: 8px;
+    }
+
+    .feed-search .btn {
+        padding: 6px 10px;
+    }
+    
+    /* 隐藏搜索框的 placeholder 以节省空间，或者减小字体 */
+    .feed-search input::placeholder {
+        font-size: 12px;
+        color: transparent; /* 可选：如果空间实在太小，可以隐藏 placeholder */
+    }
+
+    /* 移动端标签按钮增大 */
+    .badge-secondary {
+        font-size: 14px;
+        padding: 8px 14px;
+    }
+
+    /* 移动端标签容器限制高度为一行，超出隐藏 */
+    .article-tags-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px; /* 标签间距 */
+        height: 34px; /* 精确高度：14px font + 16px padding (8*2) + 2px border (1*2) = 32px，给一点余量到 34px */
+        overflow: hidden;
+        flex: 1; /* 占据剩余空间 */
+        min-width: 0; /* 防止 flex 子项溢出 */
     }
 }

@@ -12,11 +12,6 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ml-auto">
-        <!-- 条目 -->
-        <li class="nav-item">
-          <!-- 08 {#% url ... %#}自动生成URL，'article:article_list'在命名空间article中找到别名为article_list的路由 -->
-          <a class="nav-link" href="{% url 'article:article_list' %}">文章</a>
-        </li>
         {% if user.is_authenticated %}
           <!-- 如果用户已经登录，则显示用户名下拉框 -->
           <li class="nav-item dropdown">

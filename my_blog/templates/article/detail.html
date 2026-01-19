@@ -7,7 +7,7 @@
     {{ article.title }}
 {% endblock title %}
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/article/detail.css' %}">
+    <link rel="stylesheet" href="{% static 'css/article/detail.css' %}?v={{ article.updated|date:'U' }}">
 {% endblock extra_css %}
 
 <!-- 写入 base.html 中定义的 content -->

@@ -109,9 +109,9 @@ def terminal_status_receive(request):
 
             return HttpResponse('ok')
         else:
-            return HttpResponse('不接受此终端的上报,请联系管理员')
+            return HttpResponse('不接受此终端的上报,请联系管理员', status=403)
     else:
-        return HttpResponse('终端状态上报仅允许POST请求')
+        return HttpResponse('终端状态上报仅允许POST请求', status=405)
 
 from django.utils import timezone
 

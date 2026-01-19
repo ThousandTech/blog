@@ -27,17 +27,17 @@ def user_login(request):
                 # 13 重定向至文章列表页
                 return redirect("article:article_list")
             else:
-                return HttpResponse("账号或密码不正确，请重试")
+                return render(request, 'notice.html', {'message': "账号或密码不正确，请重试", 'title': "登录失败", 'icon': "fas fa-user-times"})
         # 13 如果有字段不合法
         else:
-            return HttpResponse("账号或密码输入不合法")
+            return render(request, 'notice.html', {'message': "账号或密码输入不合法", 'title': "登录失败", 'icon': "fas fa-user-times"})
     # 13 如果是GET请求
     elif request.method == "GET":
         user_login_form = UserLoginForm()
         context = {'form':user_login_form}
         return render(request,'userprofile/login.html',context)
     else:
-        return HttpResponse("请使用GET或POST请求数据")
+        return render(request, 'notice.html', {'message': "请使用GET或POST请求数据", 'title': "请求错误", 'icon': "fas fa-times-circle"})
         
 def user_logout(request):
     # 13 除掉请求中的Session ID并让后端Session过期
@@ -58,14 +58,14 @@ def user_register(request):
             login(request,new_user)
             return redirect("article:article_list")
         else:
-            return HttpResponse("用户名，邮箱，密码不合法或密钥不正确，请重试")
+            return render(request, 'notice.html', {'message': "用户名，邮箱，密码不合法或密钥不正确，请重试", 'title': "注册失败", 'icon': "fas fa-user-plus"})
     elif request.method == 'GET':
         # 14 创建空表单并通过上下文传给模板
         user_register_form = UserRegisterForm()
         context = {'form':user_register_form}
         return render(request,'userprofile/register.html',context)
     else:
-        return HttpResponse("请使用GET或POST请求数据")
+        return render(request, 'notice.html', {'message': "请使用GET或POST请求数据", 'title': "请求错误", 'icon': "fas fa-times-circle"})
 
 # 15 装饰器，用户已登录则执行下面的删除函数，未登录则跳转至登录页
 @login_required(login_url = '/userprofile/login/')
@@ -78,9 +78,9 @@ def user_delete(request,id):
             user.delete()
             return redirect("article:article_list")
         else:
-            return HttpResponse("无删除权限")
+            return render(request, 'notice.html', {'message': "无删除权限", 'title': "权限拒绝", 'icon': "fas fa-ban"})
     else:
-        return HttpResponse("此操作仅接受POST请求")
+        return render(request, 'notice.html', {'message': "此操作仅接受POST请求", 'title': "请求错误", 'icon': "fas fa-times-circle"})
 
 # 17 修改用户信息
 @login_required(login_url='/userprofile/login/')
@@ -94,7 +94,7 @@ def profile_edit(request,id):
     if request.method == 'POST':
 
         if request.user != user:
-            return HttpResponse("无修改此用户信息的权限")
+            return render(request, 'notice.html', {'message': "无修改此用户信息的权限", 'title': "权限拒绝", 'icon': "fas fa-ban"})
         # 18 request.FILES上传的文件由此传递给表单类
         profile_form = ProfileForm(request.POST, request.FILES)
         if profile_form.is_valid():
@@ -107,10 +107,10 @@ def profile_edit(request,id):
             profile.save()
             return redirect("userprofile:edit",id=id)
         else:
-            return HttpResponse("头像或简介不合法，请重试")
+            return render(request, 'notice.html', {'message': "头像或简介不合法，请重试", 'title': "错误提示", 'icon': "fas fa-exclamation-triangle"})
     elif request.method == 'GET':
         profile_form = ProfileForm()
         context = { 'profile_form':profile_form,'profile':profile,'user':user}
         return render(request,'userprofile/edit.html',context)
     else:
-        return HttpResponse("请使用GET或POST请求数据")
+        return render(request, 'notice.html', {'message': "请使用GET或POST请求数据", 'title': "请求错误", 'icon': "fas fa-times-circle"})

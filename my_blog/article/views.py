@@ -107,7 +107,7 @@ def article_list(request):
     all_tags = ArticlePost.tags.all()
     # 获取Thousand用户信息用于个人卡片展示
     try:
-        profile_user = User.objects.get(id=6)
+        profile_user = User.objects.get(username='Thousand')
     except User.DoesNotExist:
         profile_user = None
     # 06 context字典定义了要传递给模板的上下文
@@ -177,7 +177,7 @@ def article_create(request):
             return redirect("article:article_list")
         # 10 如果表单数据不合法，返回错误信息
         else:
-            return HttpResponse("表单内容有误，请重新填写")
+            return render(request, 'notice.html', {'message': "表单内容有误，请重新填写", 'title': "错误提示", 'icon': "fas fa-exclamation-triangle"})
     # 10 如果用户请求获取数据
     else:
         # 10 实例化表单类
@@ -209,9 +209,9 @@ def article_safe_delete(request,id):
             # 11 重定向到文章列表页
             return redirect("article:article_list")
         else:
-            return HttpResponse("删除操作仅允许作者本人和管理员使用")
+            return render(request, 'notice.html', {'message': "删除操作仅允许作者本人和管理员使用", 'title': "权限拒绝", 'icon': "fas fa-ban"})
     else:
-        return HttpResponse("删除操作仅允许POST请求")
+        return render(request, 'notice.html', {'message': "删除操作仅允许POST请求", 'title': "请求错误", 'icon': "fas fa-times-circle"})
     
 # 12 文章更新函数
 @login_required(login_url='/userprofile/login/')
@@ -246,7 +246,7 @@ def article_update(request,id):
                 return redirect("article:article_detail",id=id)
             # 12 如果数据不合法
             else:
-                return HttpResponse("表单内容有误，请重新填写")
+                return render(request, 'notice.html', {'message': "表单内容有误，请重新填写", 'title': "错误提示", 'icon': "fas fa-exclamation-triangle"})
         # 12 如果是get请求
         else:
             article_post_form = ArticlePostForm()
@@ -258,4 +258,4 @@ def article_update(request,id):
             context = {'article':article,'article_post_form':article_post_form,'columns':columns,'tags':tags}
             return render(request,'article/update.html',context)
     else:
-            return HttpResponse("编辑操作仅允许作者本人和管理员使用")
+            return render(request, 'notice.html', {'message': "编辑操作仅允许作者本人和管理员使用", 'title': "权限拒绝", 'icon': "fas fa-ban"})

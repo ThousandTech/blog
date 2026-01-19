@@ -316,6 +316,11 @@
     window.monitorDiskChart = initEcharts('disk-chart');
     window.monitorNetChart = initEcharts('network-chart');
 
+    window.addEventListener('resize', function() {
+        if (window.monitorDiskChart) window.monitorDiskChart.resize();
+        if (window.monitorNetChart) window.monitorNetChart.resize();
+    });
+
     function updateEarthTime() {
         var now = new Date();
 
