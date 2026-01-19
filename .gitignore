@@ -11,5 +11,7 @@ db.sqlite3
 
 # media files
 media/
+# collectedstatic files
+collected_static/
 # ENV and secret keys
 .env
