@@ -1,0 +1,143 @@
+:root {
+    --bg: #0f1216;
+    --surface: #151a21;
+    --surface-soft: #1c222b;
+    --border: #252c35;
+    --text: #e8ecf1;
+    --muted: #9aa3b0;
+    --accent: #7cc5ff;
+    --success: #9fe870;
+}
+
+html {
+    overflow-y: scroll;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+a {
+    color: var(--accent);
+}
+
+a:hover {
+    color: #b2ddff;
+}
+
+.container {
+    flex: 1;
+}
+
+label {
+    color: var(--text);
+}
+
+.form-control {
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+
+.form-control:focus {
+    background: var(--surface-soft);
+    border-color: var(--accent);
+    color: var(--text);
+    box-shadow: 0 0 0 0.2rem rgba(124, 197, 255, 0.25);
+}
+
+.form-control::placeholder {
+    color: var(--muted);
+}
+
+.btn-primary,
+.btn-info {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0c0f14;
+    font-weight: 600;
+}
+
+.btn-primary:hover,
+.btn-info:hover {
+    background: #b2ddff;
+    border-color: #b2ddff;
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.card-title,
+.card-text {
+    color: var(--text);
+}
+
+.alert {
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+
+.alert-danger {
+    color: #ffb3b3;
+}
+
+.dropdown-menu-dark {
+    background-color: #212529;
+    border: 1px solid #495057;
+}
+
+.dropdown-menu-dark .dropdown-item {
+    color: #f8f9fa;
+}
+
+.dropdown-menu-dark .dropdown-item:hover,
+.dropdown-menu-dark .dropdown-item:focus {
+    color: #ffffff;
+    background-color: #343a40;
+}
+
+.dropdown-menu-dark .dropdown-divider {
+    border-color: #495057;
+}
+
+.layui-layer-title {
+    background-color: #212529 !important;
+    color: #f8f9fa !important;
+}
+
+.layui-layer-content {
+    background-color: #212529 !important;
+    color: #f8f9fa !important;
+}
+
+.layui-layer {
+    background-color: #212529 !important;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+}
+
+.layui-layer-btn {
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 10px;
+}
+
+.layui-layer-btn button,
+.layui-layer-btn a {
+    background-color: #0d6efd !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+.layui-layer-btn button:hover,
+.layui-layer-btn a:hover {
+    background-color: #0b5ed7 !important;
+}

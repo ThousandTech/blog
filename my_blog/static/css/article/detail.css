@@ -1,0 +1,129 @@
+.alert-success {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+
+.sidebar-sticky div > ul {
+    padding-left: 20px;
+}
+
+.sidebar-sticky ul ul {
+    padding-left: 1.2em;
+}
+
+.sidebar-sticky a {
+    color: var(--accent);
+}
+
+.sidebar-sticky a:hover {
+    color: #b2ddff;
+}
+
+h1 {
+    word-break: break-all;
+    color: var(--text);
+}
+
+.article-content {
+    word-break: break-all;
+    color: var(--text);
+}
+
+.article-content pre {
+    word-break: normal;
+    overflow-x: auto;
+    background: #1a2332;
+    border: none;
+}
+
+.codehilite,
+.codehilite pre,
+.codehilite code {
+    background: #1a2332 !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 10px 12px !important;
+    color: var(--text) !important;
+    margin: 0 !important;
+}
+
+.codehilite {
+    margin: 12px 0 !important;
+}
+
+.codehilite:before,
+.codehilite:after {
+    display: none !important;
+    content: none !important;
+}
+
+.article-content img {
+    max-width: 100%;
+    height: auto;
+}
+
+hr {
+    border-color: var(--border);
+}
+
+.comment-body {
+    color: var(--text);
+    background: transparent;
+    font-family: inherit;
+    font-size: 1em;
+    white-space: pre-wrap;
+    word-break: break-all;
+    border: none;
+    padding: 0;
+}
+
+.comment-meta {
+    color: var(--muted);
+}
+
+.comment-user {
+    color: #ff9ff3;
+    font-weight: bold;
+}
+
+.comment-time {
+    color: var(--success);
+}
+
+.tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.column-tag {
+    color: hsl(var(--hue, 210), 60%, 20%);
+    background-color: hsl(var(--hue, 210), 70%, 88%);
+    border-color: hsl(var(--hue, 210), 70%, 76%);
+    font-weight: 600;
+}
+
+.column-tag:hover {
+    color: hsl(var(--hue, 210), 60%, 16%);
+    background-color: hsl(var(--hue, 210), 70%, 84%);
+    border-color: hsl(var(--hue, 210), 70%, 70%);
+    text-decoration: none;
+}
+
+.badge-secondary {
+    background-color: #2d3847;
+    color: var(--text);
+    border: 1px solid #3d4a5d;
+    transition: all 0.2s ease;
+    padding: 6px 12px;
+    border-radius: 8px;
+}
+
+.badge-secondary:hover {
+    background-color: var(--accent);
+    color: #0c0f14;
+    text-decoration: none;
+    border-color: var(--accent);
+}

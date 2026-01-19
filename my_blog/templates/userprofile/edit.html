@@ -1,101 +1,31 @@
 {% extends "base.html" %} {% load staticfiles %}
 {% block title %} {{ user.username }} 的主页 {% endblock title %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/user/edit.css' %}">
+{% endblock extra_css %}
 {% block content %}
-<style>
-    :root {
-        --bg: #0f1216;
-        --surface: #151a21;
-        --surface-soft: #1c222b;
-        --border: #252c35;
-        --text: #e8ecf1;
-        --muted: #9aa3b0;
-        --accent: #7cc5ff;
-        --success: #9fe870;
-    }
-
-    html { overflow-y: scroll; }
-
-    body {
-        background: var(--bg);
-        color: var(--text);
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-    }
-
-    a { color: var(--accent); }
-    a:hover { color: #b2ddff; }
-
-    .container { flex: 1; }
-
-    .card {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        color: var(--text);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.35);
-    }
-
-    .form-control {
-        background: var(--surface-soft);
-        border: 1px solid var(--border);
-        color: var(--text);
-    }
-
-    .form-control:focus {
-        background: var(--surface-soft);
-        border-color: var(--accent);
-        color: var(--text);
-        box-shadow: 0 0 0 0.2rem rgba(124,197,255,0.25);
-    }
-
-    .form-control::placeholder { color: var(--muted); }
-
-    label { color: var(--text); }
-
-    .btn-primary {
-        background: var(--accent);
-        border-color: var(--accent);
-        color: #0c0f14;
-        font-weight: 600;
-    }
-
-    .btn-primary:hover {
-        background: #b2ddff;
-        border-color: #b2ddff;
-    }
-
-    .avatar-overlay {
-        background: rgba(0,0,0,0);
-        opacity: 0;
-        transition: background 0.2s ease, opacity 0.2s ease;
-    }
-    .avatar-wrapper:hover .avatar-overlay {
-        background: rgba(0,0,0,0.55);
-        opacity: 1;
-    }
-</style>
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="card shadow-sm">
                 <div class="card-body">
                     <div class="d-flex flex-wrap align-items-center mb-4">
-                        <div class="avatar-wrapper mr-3 mb-3 position-relative" style="width: 130px; height: 130px;">
+                        <div class="avatar-wrapper mr-3 mb-3 position-relative">
                             {% if profile.avatar %}
-                                <img src="{{ profile.avatar.url }}" alt="头像" class="rounded-circle border w-100 h-100" style="object-fit: cover;">
+                                <img src="{{ profile.avatar.url }}" alt="头像" class="rounded-circle border w-100 h-100 avatar-image">
                             {% else %}
-                                <div class="d-flex align-items-center justify-content-center rounded-circle bg-light border w-100 h-100" style="font-size: 14px; color: #6c757d;">
+                                <div class="d-flex align-items-center justify-content-center rounded-circle bg-light border w-100 h-100 avatar-placeholder">
                                     暂无头像
                                 </div>
                             {% endif %}
-                            <label for="avatar" class="avatar-overlay d-flex align-items-center justify-content-center rounded-circle position-absolute w-100 h-100" style="top: 0; left: 0; color: #fff; cursor: pointer; font-weight: 600; letter-spacing: 1px;">
+                            <label for="avatar" class="avatar-overlay d-flex align-items-center justify-content-center rounded-circle position-absolute w-100 h-100">
                                 更换头像
                             </label>
                         </div>
                         <div>
                             <h5 class="mb-1">{{ user.username }}</h5>
                             <div class="text-secondary small mb-2">{% if user.email %}{{ user.email }}{% else %}该用户暂未填写邮箱{% endif %}</div>
-                            <div id="avatar-tip" class="text-danger small mb-2" style="display: none;">当前为头像预览，点击下方保存生效</div>
+                            <div id="avatar-tip" class="text-danger small mb-2">当前为头像预览，点击下方保存生效</div>
                             <p class="mb-0 text-secondary" style="max-width: 420px;">
                                 完善个人信息，让大家更好地了解你。
                             </p>
@@ -125,39 +55,7 @@
     </div>
 </div>
 
-<script>
-    // 头像预览
-    document.getElementById('avatar').addEventListener('change', function(e) {
-        var file = e.target.files[0];
-        if (file) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                // 查找当前头像img元素，若存在则更新，若不存在（暂无头像）则需要替换结构
-                var img = document.querySelector('.avatar-wrapper img');
-                if (img) {
-                    img.src = e.target.result;
-                } else {
-                    // 如果原先是“暂无头像”的div，则需要替换为img
-                    var wrapper = document.querySelector('.avatar-wrapper');
-                    var placeholder = wrapper.querySelector('div.d-flex');
-                    if (placeholder) {
-                        var newImg = document.createElement('img');
-                        newImg.src = e.target.result;
-                        newImg.alt = "头像";
-                        newImg.className = "rounded-circle border w-100 h-100";
-                        newImg.style.objectFit = "cover";
-                        wrapper.insertBefore(newImg, placeholder);
-                        wrapper.removeChild(placeholder);
-                    }
-                }
-                // 显示提示
-                var tip = document.getElementById('avatar-tip');
-                if (tip) {
-                    tip.style.display = 'block';
-                }
-            }
-            reader.readAsDataURL(file);
-        }
-    });
-</script>
 {% endblock content %}
+{% block extra_js %}
+    <script src="{% static 'js/user/edit.js' %}"></script>
+{% endblock extra_js %}

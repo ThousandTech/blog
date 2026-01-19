@@ -98,7 +98,7 @@ def system_state_details(request):
 def terminal_status_receive(request):
     if request.method == 'POST':
         terminal_status = json.loads(request.body)
-        if terminal_status['imei'] in settings.ALLOWED_IMEI:
+        if terminal_status['imei'] in settings.ALLOWED_IMEIS:
             TerminalMonitor.objects.create(
                 imei = terminal_status['imei'],
                 percent = terminal_status['percent'],

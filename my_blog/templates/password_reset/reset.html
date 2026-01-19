@@ -1,87 +1,12 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 {% block title %}设置新密码{% endblock %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock extra_css %}
 
 {% block content %}
-<style>
-    :root {
-        --bg: #0f1216;
-        --surface: #151a21;
-        --surface-soft: #1c222b;
-        --border: #252c35;
-        --text: #e8ecf1;
-        --muted: #9aa3b0;
-        --accent: #7cc5ff;
-        --success: #9fe870;
-    }
-
-    html {
-        overflow-y: scroll;
-    }
-
-    body {
-        background: var(--bg);
-        color: var(--text);
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-    }
-
-    a {
-        color: var(--accent);
-    }
-
-    a:hover {
-        color: #b2ddff;
-    }
-
-    .container {
-        flex: 1;
-    }
-
-    label {
-        color: var(--text);
-    }
-
-    .form-control {
-        background: var(--surface-soft);
-        border: 1px solid var(--border);
-        color: var(--text);
-    }
-
-    .form-control:focus {
-        background: var(--surface-soft);
-        border-color: var(--accent);
-        color: var(--text);
-        box-shadow: 0 0 0 0.2rem rgba(124, 197, 255, 0.25);
-    }
-
-    .form-control::placeholder {
-        color: var(--muted);
-    }
-
-    .alert {
-        background: var(--surface-soft);
-        border: 1px solid var(--border);
-        color: var(--text);
-    }
-
-    .alert-danger {
-        color: #ffb3b3;
-    }
-
-    .btn-primary {
-        background: var(--accent);
-        border-color: var(--accent);
-        color: #0c0f14;
-        font-weight: 600;
-    }
-
-    .btn-primary:hover {
-        background: #b2ddff;
-        border-color: #b2ddff;
-    }
-</style>
-<div class="container">
+<div class="container auth-container">
     <div class="row justify-content-center align-items-center" style="min-height: 75vh">
         <div class="col-12 col-md-5 col-lg-4">
             <h4 class="text-center">设置新密码</h4>
@@ -112,11 +37,7 @@
         </div>
     </div>
 </div>
-<script>
-    // Add bootstrap class to inputs
-    var inputs = document.querySelectorAll('input');
-    inputs.forEach(function(input) {
-        input.classList.add('form-control');
-    });
-</script>
 {% endblock %}
+{% block extra_js %}
+    <script src="{% static 'js/password_reset/recovery_form.js' %}"></script>
+{% endblock extra_js %}

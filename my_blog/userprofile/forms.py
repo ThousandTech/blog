@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 # 17 用户资料
 from .models import Profile
 
+from django.conf import settings
+
 # 13 登录表单，继承forms.Form类，不对数据库进行修改，需手动配置每个字段的类型
 class UserLoginForm(forms.Form):
     username = forms.CharField()
@@ -35,7 +37,7 @@ class UserRegisterForm(forms.ModelForm):
     
     def clean_secret_key(self):
         data = self.cleaned_data
-        if data.get('secret_key') =='xxxxxx':
+        if data.get('secret_key') in settings.REGISTER_KEYS:
             return data.get('secret_key')
         else:
             raise forms.ValidationError("密钥错误，请联系管理员")

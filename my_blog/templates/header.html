@@ -31,7 +31,7 @@
               <div class="dropdown-divider"></div>
               <a class="dropdown-item text-light" href="{% url 'userprofile:logout' %}">退出登录</a>
               <div class="dropdown-divider"></div>
-              <a class="dropdown-item text-light" href="#" onclick="user_delete()">删除用户</a>
+              <a class="dropdown-item text-light" href="#" data-action="user-delete">删除用户</a>
             </div>
           </li>
         <!-- 如果用户未登录，则显示 “登录” -->
@@ -57,21 +57,4 @@
 {% csrf_token %}
     <button type="submit">发送</button>
 </form>
-    <script>
-        function user_delete() {
-            // 调用layer弹窗组件
-            layer.open({
-                title: "确认删除",
-                content: "确认删除用户资料吗？",
-                btn: ['确认', '取消'],
-                yes: function(index, layero) {
-                    $('form#user_delete button').click();
-                    layer.close(index);
-                },
-                no: function(index) {
-                    layer.close(index);
-                }
-            })
-        }
-    </script>
 {% endif %}
