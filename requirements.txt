@@ -12,3 +12,4 @@ sqlparse==0.4.4
 typing_extensions==4.7.1
 uptime==3.0.1
 zipp==3.15.0
+gunicorn==21.2.0

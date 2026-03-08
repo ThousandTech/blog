@@ -1,0 +1,28 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: blog_web
+    restart: unless-stopped
+    env_file:
+      - ./my_blog/.env
+    volumes:
+      - ./my_blog/media:/app/my_blog/media
+      - ./my_blog/collected_static:/app/my_blog/collected_static
+      - ./my_blog/db.sqlite3:/app/my_blog/db.sqlite3
+    expose:
+      - "8000"
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: blog_nginx
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/blog.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./my_blog/media:/var/www/blog/media:ro
+      - ./my_blog/collected_static:/var/www/blog/static:ro
