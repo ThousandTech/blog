@@ -434,8 +434,13 @@
     }
     
     .feed-nav {
-        flex-wrap: nowrap;
+        flex-wrap: wrap;
         gap: 8px;
+    }
+
+    .feed-nav .breadcrumb {
+        flex: 1;
+        min-width: 0;
     }
 
     .feed-search .btn {

@@ -5,12 +5,23 @@
     <div class="row">
         <div class="col-12">
             <br>
-            <form method="post" action=".">
+            <form method="post" action="." enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="title">文章标题</label>
                     <!-- 在 value 属性中指定文本框的初始值为旧的内容，即 article 对象中的 title 字段 -->
                     <input type="text" class="form-control" id="title" name="title" value="{{ article.title }}">
+                </div>
+                <!-- 标题图 -->
+                <div class="form-group">
+                    <label for="avatar">标题图(可选)</label>
+                    {% if article.avatar %}
+                        <div class="mb-3">
+                            <p><strong>当前标题图：</strong></p>
+                            <img src="{{ article.avatar.url }}" alt="标题图" style="max-width: 300px; max-height: 200px;">
+                        </div>
+                    {% endif %}
+                    <input type="file" class="form-control-file" id="avatar" name="avatar">
                 </div>
                 <!-- 文章栏目 -->
                 <div class="form-group">

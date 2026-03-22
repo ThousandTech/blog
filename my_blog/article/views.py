@@ -240,6 +240,11 @@ def article_update(request,id):
                     article.column = ArticleColumn.objects.get(id=request.POST['column'])
                 else:
                     article.column = None
+                # 29 处理标题图
+                if request.FILES.get('avatar'):
+                    article.avatar = request.FILES.get('avatar')
+                article.tags.set(*request.POST.get('tags').split(','), clear=True)
+                
                 article.save()
                 # 28 保存多对多关系（tags），必须在 save() 之后调用
                 article_post_form.save_m2m()
