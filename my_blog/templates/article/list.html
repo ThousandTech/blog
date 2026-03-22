@@ -151,39 +151,49 @@
 
                 {% for article in articles %}
                     <div class="card-panel article-card">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div class="article-tags-wrapper">
-                                {% if article.column %}
-                                    {% widthratio article.column.id 1 60 as hue %}
-                                    <a href="{% url 'article:article_list' %}?column={{ article.column.id }}" 
-                                        class="btn btn-sm column-tag"
-                                        style="--hue: {{ hue }};"
-                                    >
-                                        {{ article.column }}
+                        <div class="article-card-inner {% if not article.avatar %}no-thumb{% endif %}">
+                            {% if article.avatar %}
+                                <a href="{% url 'article:article_detail' article.id %}" class="article-thumb-link">
+                                    <img src="{{ article.avatar.url }}" alt="{{ article.title }}" class="article-thumb-img">
+                                </a>
+                            {% endif %}
+
+                            <div class="article-main">
+                                <div class="article-topline">
+                                    <div class="article-tags-row">
+                                        {% if article.column %}
+                                            {% widthratio article.column.id 1 60 as hue %}
+                                            <a href="{% url 'article:article_list' %}?column={{ article.column.id }}"
+                                                class="article-pill column-tag"
+                                                style="--hue: {{ hue }};"
+                                            >
+                                                {{ article.column }}
+                                            </a>
+                                        {% endif %}
+                                        {% for tag in article.tags.all %}
+                                            <a href="{% url 'article:article_list' %}?tag={{ tag.name|urlencode }}"
+                                                class="article-pill badge badge-secondary"
+                                            >
+                                                {{ tag }}
+                                            </a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <h4 class="article-title">
+                                    <a href="{% url 'article:article_detail' article.id %}">
+                                        {{ article.title }}
                                     </a>
-                                {% endif %}
-                                {% for tag in article.tags.all %}
-                                    <a href="{% url 'article:article_list' %}?tag={{ tag.name|urlencode }}" 
-                                    class="badge badge-secondary"
-                                    >
-                                        {{ tag }}
-                                    </a>
-                                {% endfor %}
+                                </h4>
+
+                                <p class="article-summary">{{ article.body|striptags|slice:'120' }}...</p>
+
+                                <div class="article-meta article-meta-row">
+                                    <span>{{ article.total_views }} 浏览</span>
+                                    <span>{{ article.created|date:'Y-m-d' }} 发布</span>
+                                    <span>{{ article.updated|date:'Y-m-d' }} 更新</span>
+                                </div>
                             </div>
-                            <span class="article-meta text-nowrap ml-2">{{ article.updated|date:'Y-m-d' }} 更新</span>
-                        </div>
-
-                        <h4 class="article-title">
-                            <a href="{% url 'article:article_detail' article.id %}">
-                                {{ article.title }}
-                            </a>
-                        </h4>
-
-                        <p class="article-meta">{{ article.body|slice:'120' }}...</p>
-
-                        <div class="article-meta mt-2">
-                            <span>{{ article.total_views }} 浏览</span>
-                            <span>{{ article.created|date:'Y-m-d' }} 发布</span>
                         </div>
                     </div>
                 {% endfor %}

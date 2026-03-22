@@ -156,7 +156,8 @@ def article_create(request):
     # 10 如果用户提交数据
     if request.method == "POST":
         # 10 将收到的表单数据(类字典对象)存进article_post_form
-        article_post_form = ArticlePostForm(data=request.POST)
+        # 29 增加文件处理
+        article_post_form = ArticlePostForm(request.POST,request.FILES)
         # 10 如果表单内容合法
         if article_post_form.is_valid():
             # 10 生成不写入数据库的ArticlePost实例

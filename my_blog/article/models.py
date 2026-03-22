@@ -7,6 +7,8 @@ from django.utils import timezone
 from django.urls import reverse
 
 from taggit.managers import TaggableManager
+# 29 图片处理
+from PIL import Image
 
 
 # 27 栏目的模型
@@ -55,6 +57,31 @@ class ArticlePost(models.Model):
 
     # 28 标签字段
     tags = TaggableManager(blank=True)
+
+    # 29 文章标题图
+    avatar = models.ImageField(upload_to='article/%Y%m%d/',blank=True)
+
+    # 29 save是model内置的方法，每次实例保存时调用，此处改写默认方法增加文件处理逻辑
+    def save(self, *args, **kwargs):
+        # 29 调用父类文章保存
+        super(ArticlePost,self).save(*args, **kwargs)
+        # 29 如果有标题图或不是统计浏览量调用
+        if self.avatar and not kwargs.get('update_fields'):
+            # 29 基于已落盘文件进行缩小，确保上传后文件实际被覆盖
+            image = Image.open(self.avatar.path)
+            (x,y) = image.size
+            new_x = 400
+            new_y = int(new_x*(y/x))
+            # 29 平滑滤波
+            if hasattr(Image, 'Resampling'):
+                resample_filter = Image.Resampling.LANCZOS
+            elif hasattr(Image, 'LANCZOS'):
+                resample_filter = Image.LANCZOS
+            else:
+                resample_filter = Image.ANTIALIAS
+            resized_image = image.resize((new_x,new_y), resample_filter)
+            resized_image.save(self.avatar.path)
+
     
     ## 04 规范表行为
     # 04 内部类class meta用来给model定义元数据

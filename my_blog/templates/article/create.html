@@ -10,7 +10,7 @@
         <div class="col-12">
             <br>
             <!-- 10 提交文章的表单 提交方式为POST 提交地址为当前页面 -->
-            <form method="post" action=".">
+            <form method="post" action="." enctype="multipart/form-data">
                 <!-- 10 Django中需要POST数据的地方都必须有csrf_token 否则会403-->
                 {% csrf_token %}
                 <!-- 文章标题 -->
@@ -19,6 +19,11 @@
                     <label for="title">文章标题</label>
                     <!-- 10 文本框 name是表单的类字典对象的键，与表单类字段对应 -->
                     <input type="text" class="form-control" id="title" name="title">
+                </div>
+                <!-- 标题图 -->
+                <div class="form-group">
+                    <label for="avatar">标题图(可选)</label>
+                    <input type="file" class="form-control-file" id="avatar" name="avatar">
                 </div>
                 <!-- 文章栏目 -->
                 <div class="form-group">
