@@ -1,0 +1,12 @@
+.git
+.gitignore
+env
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+*.sqlite3
+my_blog/db.sqlite3
+my_blog/collected_static
+my_blog/media
+

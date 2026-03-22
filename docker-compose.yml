@@ -1,0 +1,58 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: thousand_blog_web
+    env_file:
+      - ./my_blog/.env
+    working_dir: /app/my_blog
+    command: gunicorn my_blog.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120
+    volumes:
+      - ./my_blog/media:/app/my_blog/media
+      - ./my_blog/collected_static:/app/my_blog/collected_static
+      - ./my_blog/db.sqlite3:/app/my_blog/db.sqlite3
+    restart: unless-stopped
+    expose:
+      - "8000"
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: thousand_blog_nginx
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./my_blog/media:/var/www/media:ro
+      - ./my_blog/collected_static:/var/www/static:ro
+      - ./nginx/start-nginx.sh:/etc/nginx/start-nginx.sh:ro
+      - ./nginx/default-http.conf:/etc/nginx/templates/default-http.conf:ro
+      - ./nginx/default-https.conf:/etc/nginx/templates/default-https.conf:ro
+      - certbot-www:/var/www/certbot:ro
+      - certbot-etc:/etc/letsencrypt:ro
+    command: ["/bin/sh", "/etc/nginx/start-nginx.sh"]
+    restart: unless-stopped
+
+  certbot:
+    image: certbot/certbot:latest
+    container_name: thousand_blog_certbot
+    volumes:
+      - certbot-www:/var/www/certbot
+      - certbot-etc:/etc/letsencrypt
+    profiles: ["manual"]
+
+  certbot_renew:
+    image: certbot/certbot:latest
+    container_name: thousand_blog_certbot_renew
+    volumes:
+      - certbot-www:/var/www/certbot
+      - certbot-etc:/etc/letsencrypt
+    entrypoint: /bin/sh
+    command: -c "trap 'exit 0' TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet && date; sleep 12h; done"
+    restart: unless-stopped
+
+volumes:
+  certbot-www:
+  certbot-etc:
