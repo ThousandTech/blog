@@ -31,12 +31,19 @@
                     <select class="form-control" 
                             id="column" 
                             name="column"
+                            onchange="checkColumn()"
                     >
                             <option value="none">请选择栏目..</option>
                         {% for column in columns %}
                             <option value="{{ column.id }}">{{ column }}</option>
                         {% endfor %}
+                            <option value="new">新建栏目</option>
                     </select>
+                </div>
+                <!-- 新建栏目 -->
+                <div class="form-group" id="new_column_group" style="display:none;">
+                    <label for="new_column_name">新栏目名称</label>
+                    <input type="text" class="form-control" id="new_column_name" name="new_column_name">
                 </div>
                 <!-- 文章标签 -->
                 <div class="form-group">
@@ -61,3 +68,17 @@
     </div>
 </div>
 {% endblock content %}
+
+{% block extra_js %}
+<script>
+    function checkColumn() {
+        var columnSelect = document.getElementById("column");
+        var newColumnGroup = document.getElementById("new_column_group");
+        if (columnSelect.value === 'new') {
+            newColumnGroup.style.display = 'block';
+        } else {
+            newColumnGroup.style.display = 'none';
+        }
+    }
+</script>
+{% endblock extra_js %}

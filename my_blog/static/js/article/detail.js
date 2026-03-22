@@ -27,8 +27,12 @@ function confirmDeleteArticle() {
         title: '确认删除',
         content: '确认删除这篇文章吗？',
         btn: ['确认', '取消'],
-        yes: function () {
-            alert('请使用安全删除功能');
+        yes: function (index) {
+            var button = document.querySelector('form#safe_delete button');
+            if (button) {
+                button.click();
+            }
+            layer.close(index);
         },
         no: function (index) {
             layer.close(index);

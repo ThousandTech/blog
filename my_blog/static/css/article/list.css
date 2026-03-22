@@ -302,10 +302,17 @@
 }
 
 .column-tag {
+    display: inline-block;
     color: hsl(var(--hue, 210), 60%, 20%);
     background-color: hsl(var(--hue, 210), 70%, 88%);
-    border-color: hsl(var(--hue, 210), 70%, 76%);
+    border: 1px solid hsl(var(--hue, 210), 70%, 76%);
     font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    transition: all 0.2s ease;
+    line-height: 1;
+    vertical-align: baseline;
 }
 
 .column-tag:hover {

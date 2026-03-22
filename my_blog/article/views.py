@@ -163,8 +163,14 @@ def article_create(request):
             # 10 生成不写入数据库的ArticlePost实例
             new_article = article_post_form.save(commit=False)
             # 27 如果有栏目信息
-            if request.POST['column']!='none':
-                new_article.column = ArticleColumn.objects.get(id=request.POST['column'])
+            column_id = request.POST['column']
+            if column_id == 'new':
+                new_column_name = request.POST.get('new_column_name')
+                if new_column_name:
+                    new_column, created = ArticleColumn.objects.get_or_create(title=new_column_name)
+                    new_article.column = new_column
+            elif column_id != 'none':
+                new_article.column = ArticleColumn.objects.get(id=column_id)
             # 10 修改作者为1
             # 17 指定作者id
             new_article.author = User.objects.get(id=request.user.id)
@@ -205,8 +211,15 @@ def article_safe_delete(request,id):
         article = ArticlePost.objects.get(id=id)
         # 17 仅允许作者或管理员删除
         if article.author == request.user or request.user.is_superuser:
+            # 获取文章的栏目
+            column = article.column
             # 11 删除文章
             article.delete()
+            
+            # 检查栏目是否为空
+            if column and ArticlePost.objects.filter(column=column).count() == 0:
+                column.delete()
+                
             # 11 重定向到文章列表页
             return redirect("article:article_list")
         else:
@@ -236,8 +249,14 @@ def article_update(request,id):
                 # 12 更新数据但不立即保存到数据库
                 article = article_post_form.save(commit=False)
                 # 28 处理栏目
-                if request.POST['column']!='none':
-                    article.column = ArticleColumn.objects.get(id=request.POST['column'])
+                column_id = request.POST['column']
+                if column_id == 'new':
+                    new_column_name = request.POST.get('new_column_name')
+                    if new_column_name:
+                        new_column, created = ArticleColumn.objects.get_or_create(title=new_column_name)
+                        article.column = new_column
+                elif column_id != 'none':
+                    article.column = ArticleColumn.objects.get(id=column_id)
                 else:
                     article.column = None
                 # 29 处理标题图
