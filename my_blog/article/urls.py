@@ -18,4 +18,6 @@ urlpatterns = [
     path('article-safe-delete/<int:id>/',views.article_safe_delete,name='article_safe_delete'),
     # 12 更新文章路由
     path('article-update/<int:id>/',views.article_update,name='article_update'),
+    # 正文图片上传
+    path('upload-body-image/', views.upload_body_image, name='upload_body_image'),
 ]

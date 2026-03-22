@@ -58,8 +58,10 @@
                 <!-- 文章正文 -->
                 <div class="form-group">
                     <label for="body">文章正文</label>
-                    <!-- 10 文本区域 body是表单的类字典对象的键，与表单类字段对应 -->
-                    <textarea type="text" class="form-control" id="body" name="body" rows="12"></textarea>
+                    <input type="hidden" id="body" name="body">
+                    <div id="body-editor" class="form-control" contenteditable="true" data-upload-url="{% url 'article:upload_body_image' %}" style="height:auto; min-height:280px; overflow:auto;"></div>
+                    <small class="form-text text-muted" id="body-drop-hint">支持将图片直接拖拽到正文，也支持 Ctrl+V 粘贴截图。</small>
+                    <small class="form-text text-muted" id="body-image-upload-hint"></small>
                 </div>
                 <!-- 提交按钮 -->
                 <button type="submit" class="btn btn-primary">提交</button>
@@ -81,4 +83,5 @@
         }
     }
 </script>
+<script src="{% static 'js/article/editor_image_upload.js' %}"></script>
 {% endblock extra_js %}

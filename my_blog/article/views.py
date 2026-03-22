@@ -1,6 +1,9 @@
 # 09 导入markdown
 import markdown
 import json
+import os
+import uuid
+from PIL import Image
 
 from django.shortcuts import render,redirect
 
@@ -15,6 +18,8 @@ from .forms import ArticlePostForm
 from django.contrib.auth.models import User
 # 17 引入登录检查装饰器
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import default_storage
+from django.utils import timezone
 
 # 06 导入数据模型
 from .models import ArticlePost,ArticleColumn
@@ -193,6 +198,44 @@ def article_create(request):
         # 10 上下文，模板会用前面的名字找后面的对象
         context = {'article_post_form':article_post_form,'columns':columns}
         return render(request,'article/create.html',context)
+
+
+@login_required(login_url='/userprofile/login/')
+def upload_body_image(request):
+    if request.method != "POST":
+        return JsonResponse({'success': False, 'message': "仅支持POST请求"}, status=405)
+
+    image_file = request.FILES.get('image')
+    if not image_file:
+        return JsonResponse({'success': False, 'message': "未检测到上传图片"}, status=400)
+
+    try:
+        image = Image.open(image_file)
+        image_format = image.format
+        image.verify()
+    except Exception:
+        return JsonResponse({'success': False, 'message': "图片文件已损坏或格式不受支持"}, status=400)
+
+    format_to_ext = {
+        'jpeg': 'jpg',
+        'png': 'png',
+        'gif': 'gif',
+        'webp': 'webp',
+        'bmp': 'bmp',
+        'tiff': 'tiff',
+    }
+    if not image_format:
+        return JsonResponse({'success': False, 'message': "无法识别图片格式"}, status=400)
+
+    ext = format_to_ext.get(image_format.lower())
+    if not ext:
+        return JsonResponse({'success': False, 'message': "暂不支持该图片格式"}, status=400)
+
+    image_file.seek(0)
+    upload_dir = os.path.join('article', 'body', timezone.now().strftime('%Y%m%d'))
+    filename = '{}.{}'.format(uuid.uuid4().hex, ext)
+    saved_path = default_storage.save(os.path.join(upload_dir, filename), image_file)
+    return JsonResponse({'success': True, 'url': default_storage.url(saved_path)})
     
 # 11 删除文章视图函数(不安全)
 # def article_delete(request,id):
